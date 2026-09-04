@@ -1,0 +1,343 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "ClientOnboarding";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link href="~/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/public/css/vendors.min.css" rel="stylesheet" />
+    <link href="~/public/vendor/jquery-steps/jquery.steps.min.css" rel="stylesheet" />
+    <link href="~/public/css/theme.min.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/ClientOnboarding.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/ClientInvoicePrint.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<div class="main-content">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="page-header-title">
+                <h4 class="m-b-10">Email Template</h4>
+            </div>
+            <p class="mb-0">Design communication models and map dynamic placeholders to automate client SLA notifications</p>
+        </div>
+        <div class="page-header-right ms-auto">
+            <div class="page-header-right-items">
+                <div class="d-flex align-items-center gap-2 page-header-right-items-wrapper">
+                    <button type="button" class="btn btn-primary" id="addTemplateBtn">
+                        <i class="feather-plus me-2"></i>
+                        <span>Create Custom Template</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="nav nav-pills flex-column" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link active w-100 text-start" id="pills-all-tab" data-bs-toggle="pill" data-bs-target="#pills-all" type="button">
+                                <p class="mb-0 fw-bold">30-Day Renewal Reminder</p>
+                                <span class="fs-11">Code: RENEWAL_30_DAY_NOTICE</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link w-100 text-start" id="pills-new-tab" data-bs-toggle="pill" data-bs-target="#pills-new" type="button">
+                                <p class="mb-0 fw-bold">15-Day Critical Renewal Warning</p>
+                                <span class="fs-11">Code: RENEWAL_15_DAY_NOTICE</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link w-100 text-start" id="pills-active-tab" data-bs-toggle="pill" data-bs-target="#pills-active" type="button">
+                                <p class="mb-0 fw-bold">Expiry Day Final Alert</p>
+                                <span class="fs-11">Code: EXPIRY_DAY_NOTICE</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-9">
+            <div class="tab-content" id="pills-tabContent">
+                <div class="tab-pane fade show active" id="pills-all" role="tabpanel" aria-labelledby="pills-all-tab" tabindex="0">
+                    <div class="template-wrapper">
+                        <div class="card view-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">30-Day Renewal Reminder</h6>
+                                        <span class="muted">Placeholder mapping validation code: RENEWAL_30_DAY_NOTICE</span>
+                                    </div>
+                                    <div class="gap-2 d-flex d-none">
+                                        <button type="button" class="btn btn-primary btn-sm edit-btn"><i class="fa-regular fa-pen-to-square"></i></button>
+                                        <button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <hr>
+                                <span class="fs-11 text-muted">Dispatched Mail Subject Line</span>
+                                <p class="mb-3 mt-2 py-2 px-3 bg-light rounded">Action Required: Contract Renewal Reminder for {{client_name}}</p>
+                                <span class="fs-11 text-muted">Default Communication Body Text</span>
+                                <p class="mb-0 mt-2 p-3 bg-light rounded">
+                                    Dear Partner,
+                                    <br><br>
+                                    We would like to remind you that your service subscription for {{client_name}} is nearing completion. Your current contract is scheduled to conclude on {{contract_end_date}}.
+                                    <br><br>
+                                    Summary:<br>
+                                    - Current Pricing: ${{price}}<br>
+                                    - Next Term Proposed Pricing: ${{next_price}}<br>
+                                    - Renewal Status: {{renewal_type}} Renewal<br>
+                                    <br><br>
+                                    Please let us know if any adjustments are required or if you need help processing your renewal paperwork to prevent service disruption.
+                                    <br><br>
+                                    Best regards,<br>
+                                    {{sender_name}}
+                                    {{sender_title}}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card d-none edit-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-0">Edit Template text</h6>
+                                    <button type="button" class="btn btn-danger btn-sm close-edit"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                                <hr>
+                                <form>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label>Template UI Name</label>
+                                            <input class="form-control" type="text" value="30-Day Renewal Reminder">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Kernel Reference Code</label>
+                                            <input class="form-control" type="text" value="RENEWAL_30_DAY_NOTICE" disabled>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label>Default Subject Header Line</label>
+                                            <input class="form-control" type="text" value="Action Required: Contract Renewal Reminder for {{client_name}}">
+                                        </div>
+                                        <div class="col-12">
+                                            <label>Dynamic Communication Content Body</label>
+                                            <textarea class="form-control" rows="4"> Dear Partner, We would like to remind you that your service subscription for {{client_name}} is nearing completion. Your current contract is scheduled to conclude on {{contract_end_date}}. Summary: Current Pricing: ${{price}}, Next Term Proposed Pricing: ${{next_price}}, Renewal Status: {{renewal_type}} Renewal<br> Please let us know if any adjustments are required or if you need help processing your renewal paperwork to prevent service disruption. Best regards, {{sender_name}}, {{sender_title}}
+                                                        </textarea>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <div class="gap-2 d-flex justify-content-end">
+                                                <button type="button" class="btn btn-danger btn-sm close-edit">Discard</button>
+                                                <button type="button" class="btn btn-primary btn-sm close-edit">Save Template</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-new" role="tabpanel" aria-labelledby="pills-new-tab" tabindex="0">
+                    <div class="template-wrapper">
+                        <div class="card view-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">15-Day Critical Renewal Warning</h6>
+                                        <span class="muted">Placeholder mapping validation code: RENEWAL_15_DAY_NOTICE</span>
+                                    </div>
+                                    <div class="gap-2 d-flex d-none">
+                                        <button type="button" class="btn btn-primary btn-sm edit-btn"><i class="fa-regular fa-pen-to-square"></i></button>
+                                        <button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <hr>
+                                <span class="fs-11 text-muted">Dispatched Mail Subject Line</span>
+                                <p class="mb-3 mt-2 py-2 px-3 bg-light rounded">URGENT: 15 Days Until Service Expiry - {{client_name}}</p>
+                                <span class="fs-11 text-muted">Default Communication Body Text</span>
+                                <p class="mb-0 mt-2 p-3 bg-light rounded">
+                                    Dear Management Team,
+                                    <br><br>
+                                    This is a critical reminder that your platform access for {{client_name}} will reach its renewal deadline in exactly 15 days on {{contract_end_date}}.
+                                    <br><br>
+                                    If you have auto-renewal, the price structure of ${{next_price}} will be active automatically. If your renewal mechanism is MANUAL, we must receive your signed addendum by {{contract_end_date}} to maintain continuous database uptime.
+                                    <br><br>
+                                    For questions, please reach out to customer billing directly.
+                                    <br><br>
+                                    In partnership,<br>
+                                    {{sender_name}}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card d-none edit-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-0">Edit Template text</h6>
+                                    <button type="button" class="btn btn-danger btn-sm close-edit"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                                <hr>
+                                <form>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label>Template UI Name</label>
+                                            <input class="form-control" type="text" value="15-Day Critical Renewal Warning">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Kernel Reference Code</label>
+                                            <input class="form-control" type="text" value="RENEWAL_15_DAY_NOTICE" disabled>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label>Default Subject Header Line</label>
+                                            <input class="form-control" type="text" value="URGENT: 15 Days Until Service Expiry - {{client_name}}">
+                                        </div>
+                                        <div class="col-12">
+                                            <label>Dynamic Communication Content Body</label>
+                                            <textarea class="form-control" rows="4"> Dear Management Team, This is a critical reminder that your platform access for {{client_name}} will reach its renewal deadline in exactly 15 days on {{contract_end_date}}. If you have auto-renewal, the price structure of ${{next_price}} will be active automatically. If your renewal mechanism is MANUAL, we must receive your signed addendum by {{contract_end_date}} to maintain continuous database uptime. For questions, please reach out to customer billing directly. In partnership, {{sender_name}}
+                                                        </textarea>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <div class="gap-2 d-flex justify-content-end">
+                                                <button type="button" class="btn btn-danger btn-sm close-edit">Discard</button>
+                                                <button type="button" class="btn btn-primary btn-sm close-edit">Save Template</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="pills-active" role="tabpanel" aria-labelledby="pills-active-tab" tabindex="0">
+                    <div class="template-wrapper">
+                        <div class="card view-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <h6 class="mb-0">Expiry Day Final Alert</h6>
+                                        <span class="muted">Placeholder mapping validation code: EXPIRY_DAY_NOTICE</span>
+                                    </div>
+                                    <div class="gap-2 d-flex d-none">
+                                        <button type="button" class="btn btn-primary btn-sm edit-btn"><i class="fa-regular fa-pen-to-square"></i></button>
+                                        <button type="button" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <hr>
+                                <span class="fs-11 text-muted">Dispatched Mail Subject Line</span>
+                                <p class="mb-3 mt-2 py-2 px-3 bg-light rounded">CONTRACT EXPIRED: Service Deactivation Warning for {{client_name}}</p>
+                                <span class="fs-11 text-muted">Default Communication body text</span>
+                                <p class="mb-0 mt-2 p-3 bg-light rounded">
+                                    WARNING:
+                                    <br><br>
+                                    Your contract for {{client_name}} has reached its conclusion date ({{contract_end_date}}).
+                                    <br><br>
+                                    Your service is now operating under the standard grace period of 15 days. Post-expiry escalation structures are active: please finalize your subscription renewal (Current Pricing: ${{price}}) immediately to avoid automatic API lockouts.
+                                    <br><br>
+                                    Final Notice Generated By:<br>
+                                    {{sender_name}}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card d-none edit-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-0">Edit Template text</h6>
+                                    <button type="button" class="btn btn-danger btn-sm close-edit"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                                <hr>
+                                <form>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label>Template UI Name</label>
+                                            <input class="form-control" type="text" value="Expiry Day Final Alert">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label>Kernel Reference Code</label>
+                                            <input class="form-control" type="text" value="EXPIRY_DAY_NOTICE" disabled>
+                                        </div>
+                                        <div class="col-12 mb-3">
+                                            <label>Default Subject Header Line</label>
+                                            <input class="form-control" type="text" value="CONTRACT EXPIRED: Service Deactivation Warning for {{client_name}}">
+                                        </div>
+                                        <div class="col-12">
+                                            <label>Dynamic Communication Content Body</label>
+                                            <textarea class="form-control" rows="4"> WARNING: Your contract for {{client_name}} has reached its conclusion date ({{contract_end_date}}). Your service is now operating under the standard grace period of 15 days. Post-expiry escalation structures are active: please finalize your subscription renewal (Current Pricing: ${{price}}) immediately to avoid automatic API lockouts. Final Notice Generated By: {{sender_name}}
+                                                        </textarea>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <div class="gap-2 d-flex justify-content-end">
+                                                <button type="button" class="btn btn-danger btn-sm close-edit">Discard</button>
+                                                <button type="button" class="btn btn-primary btn-sm close-edit">Save Template</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- create Template start here -->
+            <div class="card d-none" id="createTemplateCard">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <h6 class="mb-0">Design Template Schema</h6>
+                        <button type="button" class="btn btn-danger btn-sm close-edit"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <hr>
+                    <form>
+                        <input class="form-control" type="hidden" id="hdnTemplateId" value="0">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label>Template UI Name</label>
+                                <input class="form-control" type="text" id="test_email_address">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label>Kernel Reference Code</label>
+                                <input class="form-control" type="text" id="reference_code">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label>Default Subject Header Line</label>
+                                <input class="form-control" type="text" id="template_subject">
+                            </div>
+                            <div class="col-12">
+                                <label>Dynamic Communication Content Body</label>
+                                <textarea class="form-control" rows="4" id="template_body"></textarea>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <div class="gap-2 d-flex justify-content-end">
+                                    <button type="button" class="btn btn-danger btn-sm close-edit">Discard</button>
+                                    <button type="button" class="btn btn-primary btn-sm close-edit">Save Template</button>
+
+                                    <button type="button" class="btn btn-success btn-sm send-email">Send Email</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- create Template end here -->
+
+        </div>
+    </div>
+</div>
+
+
+@section BottomJS {
+    <script src="~/Public/pdfjs/pdf.js"></script>
+    <script src="~/public/vendor/jquery-steps/jquery.steps.min.js"></script>
+    <script src="~/public/js/custom-js/BillingRevenue/EmailTemplate.js"></script>
+}

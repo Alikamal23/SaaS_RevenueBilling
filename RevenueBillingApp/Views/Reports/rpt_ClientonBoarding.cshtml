@@ -1,0 +1,147 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Clint on Boarding";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss {
+    <link href="~/Public/css/custom-css/Reports/_reportcss.css" rel="stylesheet" />
+}
+
+<div class="container-fluid report-container">
+    <div class="report-header">
+        <div class="header-left">
+            <h2>Client On Boarding Report</h2>
+            <p>Complete Client Profile Summary</p>
+        </div>
+
+        <div class="header-right">
+            <button type="button" id="btnPDF" class="btn-pdf no-print">
+                <i class="fa fa-file-pdf-o"></i> Export PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="client-info">
+        <div class="info-box">
+            <label>Client Name</label>
+            <span>ABC Trading LLC</span>
+        </div>
+
+        <div class="info-box">
+            <label>Reference No</label>
+            <span>COB-2025-001</span>
+        </div>
+
+        <div class="info-box">
+            <label>Status</label>
+            <span class="badge badge-success">Completed</span>
+        </div>
+
+        <div class="info-box">
+            <label>Date</label>
+            <span>01-Aug-2025</span>
+        </div>
+    </div>
+
+    <div class="forms-grid">
+
+        <div class="form-card">
+            <h4>01. Client Information Form</h4>
+            <ul>
+                <li>Company Name</li>
+                <li>Business Type</li>
+                <li>Registration No</li>
+            </ul>
+        </div>
+
+        <div class="form-card">
+            <h4>02. Contact Details Form</h4>
+            <ul>
+                <li>Phone Numbers</li>
+                <li>Email Address</li>
+                <li>Office Address</li>
+            </ul>
+        </div>
+
+        <div class="form-card">
+            <h4>03. Shareholder Information</h4>
+            <ul>
+                <li>Shareholder Details</li>
+                <li>Ownership %</li>
+                <li>Nationality</li>
+            </ul>
+        </div>
+
+        <div class="form-card">
+            <h4>04. Director Information</h4>
+            <ul>
+                <li>Director Name</li>
+                <li>ID Details</li>
+                <li>Designation</li>
+            </ul>
+        </div>
+
+        <div class="form-card">
+            <h4>05. UBO Information</h4>
+            <ul>
+                <li>Beneficial Owner</li>
+                <li>Ownership</li>
+                <li>Verification</li>
+            </ul>
+        </div>
+
+        <div class="form-card">
+            <h4>06. Bank Information</h4>
+            <ul>
+                <li>Bank Name</li>
+                <li>Account Number</li>
+                <li>IBAN</li>
+            </ul>
+        </div>
+
+        <div class="form-card">
+            <h4>07. Compliance Form</h4>
+            <ul>
+                <li>KYC Status</li>
+                <li>AML Check</li>
+                <li>Risk Level</li>
+            </ul>
+        </div>
+
+        <div class="form-card">
+            <h4>08. Tax Information</h4>
+            <ul>
+                <li>Tax Number</li>
+                <li>VAT Status</li>
+                <li>Country</li>
+            </ul>
+        </div>
+
+        <div class="form-card">
+            <h4>09. Document Checklist</h4>
+            <ul>
+                <li>Passport Copy</li>
+                <li>License Copy</li>
+                <li>Utility Bill</li>
+            </ul>
+        </div>
+
+        <div class="form-card">
+            <h4>10. Final Approval Form</h4>
+            <ul>
+                <li>Manager Approval</li>
+                <li>Compliance Approval</li>
+                <li>Completion Status</li>
+            </ul>
+        </div>
+
+    </div>
+
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/html2pdf.bundle.min.js"></script>
+
+    <script src="~/Public/js/custom-js/Reports/rpt_ClientonBoarding.js"></script>
+}

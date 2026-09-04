@@ -1,0 +1,18 @@
+﻿label {
+    font-size: small;
+}
+
+input, .form-select {
+    font-size: 11px !important;
+}
+
+table tbody td {
+    font-size: 12px;
+}
+
+/*abc*/
+.uploadProfileInput {
+    opacity: 0;
+    width: 0;
+}
+/*abc*/

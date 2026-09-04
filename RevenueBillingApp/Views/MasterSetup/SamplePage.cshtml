@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Chart of Accounts";
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/themes/default/style.min.css" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.12/jstree.min.js"></script>
+
+<div class="card p-3" style="max-height: 600px; overflow:auto;">
+    <div class="d-flex gap-2 mb-2">
+        <button class="btn btn-sm btn-secondary" id="btnExpand">View All</button>
+        <button class="btn btn-sm btn-secondary" id="btnCollapse">Collapse All</button>
+        <button class="btn btn-sm btn-primary" id="btnReport">Report</button>
+    </div>
+
+    <div id="treeAccounts"></div>
+</div>
+
+<script>
+    $(function () {
+        // Load Tree Data from Controller
+        $('#treeAccounts').jstree({
+            'core': {
+                'data': {
+                    'url': '/Accounts/GetChartTree',
+                    'dataType': 'json'
+                }
+            }
+        });
+
+        // Expand / Collapse All
+        $('#btnExpand').click(() => $('#treeAccounts').jstree('open_all'));
+        $('#btnCollapse').click(() => $('#treeAccounts').jstree('close_all'));
+
+        // Handle node click
+        $('#treeAccounts').on('select_node.jstree', function (e, data) {
+            let id = data.node.id;
+            let text = data.node.text;
+            console.log("Selected:", id, text);
+            // Example: open report page
+            // window.location.href = '/Accounts/Report?id=' + id;
+        });
+    });
+</script>

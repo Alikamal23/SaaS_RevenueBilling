@@ -1,0 +1,125 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Reports Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link href="~/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/public/css/vendors.min.css" rel="stylesheet" />
+    <link href="~/public/css/theme.min.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/ReportDashboard.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/report.css" rel="stylesheet" />
+}
+
+<div class="main-content">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="page-header-title">
+                <h4 class="m-b-10">Reports</h4>
+            </div>
+            <p class="mb-0">Select report and view or export</p>
+        </div>
+        <div class="page-header-right">
+            <button type="button" class="btn btn-outline-primary" id="btnBackToParameters" style="display:none;">
+                <i class="feather-arrow-left me-2"></i>Back
+            </button>
+        </div>
+    </div>
+
+    <!-- REPORT FILTER PANEL -->
+    <div class="card mt-3" id="reportFilterCard">
+
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="feather-bar-chart-2 me-2"></i>
+                Report Parameters
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <div class="row g-3">
+
+                <!-- Report Type -->
+                <div class="col-md-4">
+
+                    <label class="form-label fw-bold">
+                        Report Type
+                    </label>
+
+                    <select class="form-select" id="ddlReportType">
+
+                        <option value="ClientList">
+                            Client List
+                        </option>
+
+                        <option value="ContractList">
+                            Client Contract List
+                        </option>
+
+                        <option value="InvoiceList">
+                            Client Invoice List
+                        </option>
+
+                        <option value="InvoiceDue">
+                            Invoice Due Report
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <!-- ===================================== -->
+            <!-- DYNAMIC PARAMETERS -->
+            <!-- ===================================== -->
+
+            <div id="reportParameters" class="mt-4">
+            </div>
+
+
+            <!-- ===================================== -->
+            <!-- ACTIONS -->
+            <!-- ===================================== -->
+
+            <div class="row mt-3">
+
+                <div class="col-md-12 d-flex justify-content-end">
+
+                    <button type="button"
+                            class="btn btn-success"
+                            id="btnViewReport">
+
+                        <i class="feather-bar-chart-2 me-2"></i>
+                        View Report
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- REPORT RESULT -->
+    <!-- ===================================== -->
+
+    <div id="reportResult"
+         class="mt-4 pb-3"
+         style="display:none;">
+    </div>
+
+</div>
+
+
+@section BottomJS {
+    <script src="~/public/js/custom-js/BillingRevenue/ReportDashboard.js"></script>
+}

@@ -1,0 +1,274 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Client on Boarding";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link rel="stylesheet" type="text/css" href="~/Public/css/custom-css/Workflow/HistoryCards.css" />
+
+    <link rel="stylesheet" type="text/css" href="~/Public/css/vendors.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/style.css" />
+}
+
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<div class="page-header mb-2 d-flex align-items-center justify-content-between">
+    <div class="page-header-left">
+        <div class="page-header-title">
+            <h4 class="m-b-10">Client Onboarding Overview</h4>
+        </div>
+        <p class="mb-0">Client Basic Information</p>
+    </div>
+    <div class="page-header-right ms-auto">
+        <div class="page-header-right-items">
+            <div class="d-flex">
+                <a href="/Trans/ViewClientOnBoarding" class="btn btn-indigo btn-sm"><i class="feather-list pe-2"></i>Listing</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header p-0">
+            </div>
+            <div class="card-body">
+                <div id="workflowDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <input type="hidden" id="defaultform" value="@defaultform" />
+
+                        <form id="intiateform" name="intiateform" method="post" action="">
+                            <input type="hidden" value="@wfCode" id="workflow" name="workflow" />
+
+                            <input type="hidden" id="hdnClientId" value="@ViewBag.ClientId" />
+                            <input type="hidden" id="hdnAction" value="Add" />
+                            <div class="row" id="appendForm">
+                                <div class="nxl-content">
+                                    <div class="main-content">
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="card border-top-0">
+
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Client Information</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Client Name <strong style="color:orangered">*</strong></label>
+                                                                <input class="form-control" type="text" id="client_name" name="client_name">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Industry</label>
+                                                                <select class="form-select" id="ddlIndustry" name="industry_id">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Company Size</label>
+                                                                <select class="form-select" id="ddlCompanySize" name="company_size_id">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Website <strong style="color:orangered">*</strong></label>
+                                                                <input class="form-control" type="text" id="website" name="website">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Tax Registration No (NTN/VAT/TRN) <strong style="color:orangered">*</strong></label>
+                                                                <input class="form-control" type="text" id="tax_registration_no" name="tax_registration_no">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Country</label>
+                                                                <select class="form-select" id="ddlCountry" name="country_id">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label">Billing Address <strong style="color:orangered">*</strong></label>
+                                                                <textarea class="form-control" rows="3" id="billing_address" name="billing_address"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                    <div class="card-body">
+                                                        <h5 class="fw-bold mb-3">Primary Contact Details</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Full Name <strong style="color:orangered">*</strong></label>
+                                                                <input class="form-control" type="text" id="primary_contact_name" name="primary_contact_name">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Email Address <strong style="color:orangered">*</strong></label>
+                                                                <input class="form-control" type="text" id="primary_contact_email" name="primary_contact_email">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Phone Number <strong style="color:orangered">*</strong></label>
+                                                                <input class="form-control" type="text" id="primary_contact_phone" name="primary_contact_phone">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Commercial Setup</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Contract Type <strong style="color:orangered">*</strong></label>
+                                                                <select class="form-select" id="ddlContractType" name="contract_type_id">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Account Owner (Internal)</label>
+                                                                <select class="form-select" id="ddlaccOwner" name="account_owner_id">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Support Owner</label>
+                                                                <select class="form-select" id="ddlsupOwner" name="support_owner_id">
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Timeline &amp; Key Dates</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Onboarding Start Date</label>
+                                                                <input class="form-control" type="date" id="onboarding_start_date" name="onboarding_start_date">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Estimated Completion Date</label>
+                                                                <input class="form-control" type="date" id="onboarding_completion_date" name="onboarding_completion_date">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Billing Start Date</label>
+                                                                <input class="form-control" type="date" id="billing_start_date" name="billing_start_date">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Contract Start Date</label>
+                                                                <input class="form-control" type="date" id="contract_start_date" name="contract_start_date">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Contract End/Renewal Date</label>
+                                                                <input class="form-control" type="date" id="contract_end_date" name="contract_end_date">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                    <div class="card-body" id="docSection">
+                                                        <h5 class="mb-3 fw-bold">Required Documents</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-4 uploader">
+                                                                <label class="upload-box w-100">
+                                                                <input type="file" id="doc" name="contract_upload" class="d-none file-input" multiple accept=".pdf, .doc, .docx">
+                                                                    <h5>Upload Signed Contract</h5>
+                                                                    <p class="text-muted mb-0">PDF, DOCX, DOC</p>
+                                                                </label>
+                                                                <div class="preview-container row"></div>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4 uploader">
+                                                                <label class="upload-box w-100">
+                                                                <input type="file" id="nda" name="nda_upload" class="d-none file-input" multiple accept=".pdf, .doc, .docx">
+                                                                    <h5>Upload NDA</h5>
+                                                                    <p class="text-muted mb-0">PDF, DOCX, DOC</p>
+                                                                </label>
+                                                                <div class="preview-container row"></div>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4 uploader">
+                                                                <label class="upload-box w-100">
+                                                                <input type="file" id="proposal" name="proposal_upload" class="d-none file-input" multiple accept=".pdf, .doc, .docx">
+                                                                    <h5>Upload Approved Proposal</h5>
+                                                                    <p class="text-muted mb-0">PDF, DOCX, DOC</p>
+                                                                </label>
+                                                                <div class="preview-container row"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Internal Administration <strong style="color:orangered">*</strong></h5>
+                                                        <div class="d-flex align-items-center justify-content-between p-3 rounded-3 custom-switch bd-blue-500">
+                                                            <div>
+                                                                <p class="mb-1 fw-bold">High-Value Client</p>
+                                                                <p class="small mb-0">Flag this client for executive reporting and special attention.</p>
+                                                            </div>
+                                                            <div class="form-check form-switch p-0 m-0 fs-4">
+                                                                <input id="highvalue" name="high_value_client" value="true" class="form-check-input ms-0" type="checkbox" role="switch">
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-3">
+                                                            <label class="form-label">Priority Level</label>
+                                                            <div class="row g-2 priority-btn-group" role="group">
+                                                                <div class="col">
+                                                                    <input type="radio" class="btn-check" name="priority_level" id="prio-low" value="low">
+                                                                    <label class="btn w-100 bg-light d-block text-center rounded-3" for="prio-low">Low</label>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <input type="radio" class="btn-check" name="priority_level" id="prio-med" value="medium">
+                                                                    <label class="btn w-100 bg-light d-block text-center rounded-3" for="prio-med">Medium</label>
+                                                                </div>
+                                                                <div class="col">
+                                                                    <input type="radio" class="btn-check" name="priority_level" id="prio-high" value="high">
+                                                                    <label class="btn w-100 bg-light d-block text-center rounded-3" for="prio-high">High</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @if (_allowinsert)
+                            {
+                                <br />
+                                <div class="row ">
+                                    @* <div class="d-flex justify-content-end flex-wrap" id="actionId"></div> *@
+                                    <div class="d-flex justify-content-end flex-wrap" id="actionId">
+                                        <button type="button" class="btn btn-success btn-sm SaveBtn" id="SaveBtn"><i class="feather-save pe-2"></i>Save</button>
+
+                                    </div>
+                                </div>
+                            }
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/vendors.min.js"></script>
+    <script src="~/Public/js/common-init.min.js"></script>
+    @* <script src="~/Public/js/client-onboarding.js"></script> *@
+
+    <script src="~/Public/vendor/leaderline/leaderline.js"></script>
+    <script src="~/Public/js/custom-js/Workflow/WorkflowManager.js"></script>
+    <script src="~/Public/js/custom-js/Trans/ClientOnBoarding.js"></script>
+}

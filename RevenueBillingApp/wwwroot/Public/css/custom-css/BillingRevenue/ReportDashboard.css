@@ -1,0 +1,77 @@
+﻿/* ReportDashboard.css mein sabse upar add karo, safety ke liye */
+.page-header {
+    border-radius: 10px !important;
+    padding: 15px 30px;
+}
+
+    .page-header h5 {
+        font-weight: 700;
+    }
+
+
+.report-card {
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #e5e7eb;
+    height: 100%;
+}
+
+    .report-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        border-color: #3454d1;
+    }
+
+.report-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+    .report-icon i {
+        font-size: 24px !important;
+    }
+
+/* =========================================================
+   REPORT PAGE - REMOVE LAYOUT PADDING
+   ========================================================= */
+
+.nxl-container .nxl-content .main-content {
+    padding: 15px 25px 20px !important;
+}
+
+/*
+.nxl-container .nxl-content .main-content {
+    overflow-x: hidden;
+    padding: 10px 15px 5px !important;
+}*/
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* =========================================================
+   REPORT RESULT CONTAINER - Match with .page-header
+   ========================================================= */
+#reportResult {
+    margin: 0;
+    padding: 0;
+}
+
+    #reportResult .report-wrapper {
+        border-radius: 10px !important;
+        overflow: hidden !important;
+        border: 1px solid #e5e7eb;
+        margin: 0 !important; /* NAYA — extra margin force-remove karo */
+        width: 100% !important; /* NAYA — poori width le */
+    }
+
+#reportFilterCard {
+    border-radius: 10px;
+}

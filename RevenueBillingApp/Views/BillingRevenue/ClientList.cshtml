@@ -1,0 +1,129 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "ClientList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link href="~/public/css/custom-css/BillingRevenue/ClientList.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/ClientInvoicePrint.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<div class="nxl-content">
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="page-header-title">
+                <h4 class="m-b-10" id="pageTitle">Client List</h4>
+            </div>
+            <p class="mb-0" id="pageDescription">Create the client record + define contract basics</p>
+        </div>
+    </div>
+</div>
+
+<div class="nxl-content">
+    <div class="row mt-2">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-body p-0">
+                <ul class="nav nav-pills mb-3 mt-3 me-3 justify-content-end" id="pills-tab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pills-all-tab" data-bs-toggle="pill" data-bs-target="#pills-all" type="button" role="tab" aria-controls="pills-all" aria-selected="true">Client List</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-new-tab" data-bs-toggle="pill" data-bs-target="#pills-new" type="button" role="tab" aria-controls="pills-new" aria-selected="false">Invoice List</button>
+                    </li>
+@*                     <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pills-active-tab" data-bs-toggle="pill" data-bs-target="#pills-active" type="button" role="tab" aria-controls="pills-active" aria-selected="false">Active</button>
+                    </li>
+*@
+                </ul>
+                <div class="tab-content" id="pills-tabContent">
+
+                        <div class="tab-pane fade show active" id="pills-all" role="tabpanel" aria-labelledby="pills-all-tab" tabindex="0">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="user-master">
+                                    <thead>
+                                        <tr>
+                                            <th>Client Name</th>
+                                            <th>Contract ID</th>
+                                            <th>Contract Type</th>
+                                            <th>Billing Frequency</th>
+                                            <th>Contract Period</th>
+                                            <th>Value (Pricing)</th>
+                                            <th>Renewal Type</th>
+                                            <th>Created On</th>
+                                             <th>Status</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade" id="pills-new" role="tabpanel" aria-labelledby="pills-new-tab" tabindex="0">
+
+                            <div id="InvoiceDiv">
+                                <div class="div-loader">
+
+                                    <div class="loader-wrapper d-none">
+                                        <span class="loader"></span>
+                                    </div>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="inv_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Invoice No</th>
+                                                    <th>Client Name</th>
+                                                    <th>Contract No</th>
+                                                    <th>Contract Type</th>
+                                                    <th>Invoice Date</th>
+                                                    <th>Due Date</th>
+                                                    <th>Invoice Amount</th>
+                                                    <th>Invoice Status</th>
+                                                    <th>Payment Status</th>
+                                                    <th>Created On</th>
+                                                    <th class="text-end">Actions</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                        
+                        @* 
+                    <div class="tab-pane fade" id="pills-active" role="tabpanel" aria-labelledby="pills-active-tab" tabindex="0">
+                            <p class="text-center">No clients matching search terms exist in current directory.</p>
+                    </div>
+                    *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@section BottomJS {
+    <script src="~/public/js/custom-js/BillingRevenue/ClientList.js"></script>
+}

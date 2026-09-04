@@ -1,0 +1,75 @@
+﻿/* KeyFactors.css */
+
+/* General page styling */
+body {
+    background-color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Form spacing */
+#Form1 label {
+    font-weight: 500;
+}
+
+#Form1 input[type="text"] {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Table styling */
+#user-master th, #user-master td {
+    vertical-align: middle;
+}
+
+/* Buttons */
+.savebutton, .updatebutton, .clearbutton {
+    min-width: 100px;
+}
+
+/* Loader animation (if applicable) */
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+/*.btn-level-style {
+    float: right !important;
+}
+
+.btn-style-right {
+    justify-content: normal !important;
+    display: inline !important;
+}*/
+
+
+.btn-style-right {
+    position: relative;
+}
+
+.right-buttons {
+    float: right;
+    display: flex;
+    gap: 20px; /* space between buttons */
+    align-items: center;
+}
+
+.btn-level-style {
+    float: none !important;
+}
+
+

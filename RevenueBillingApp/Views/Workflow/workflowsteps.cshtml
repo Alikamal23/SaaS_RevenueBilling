@@ -1,0 +1,178 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Workflows";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link href="~/Public/css/custom-css/Workflow/WorkflowSteps.css" rel="stylesheet" />
+}
+
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Create New Step</h4>
+            </div>
+            <div class="card-body">
+                <form id="workflowstepsform" name="workflowstepsform" method="post" action="">
+                    <div class="row">
+                        <div class="d-none">
+                            <input type="hidden" value="" id="s-workflowstepid" name="id" />
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Select Workflow</label>
+                            <select class="form-select" id="s-workflow" name="workflowid" required>
+                                <option value="">Select Workflow</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Step Title</label>
+                            <input type="text" class="form-control" id="s-workflowstep" name="workflowstep" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Select Role</label>
+                            <select class="form-select" id="s-RoleID" name="RoleID"></select>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label class="w-100">Approval Type</label>
+                            <select class="form-select" id="s-approvaltypeid" name="approvaltypeid" required>
+                                <option value="">Select Approval Type</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>SLA</label>
+                            <input type="number" class="form-control" id="s-sla" name="sla" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Sort Id</label>
+                            <input type="number" class="form-control" id="s-sortid" name="sortid" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2  mt-3 mt-lg-auto">
+                            <label>Active</label>
+                            <input class="checkboxsize" type="checkbox" id="s-active" name="isactive">
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4 mt-3 mt-lg-auto">
+                            @if (_allowinsert)
+                            {
+                                <button class="btn btn-primary btn-sm savebutton" type="button" id="SaveBtn"><i class='bx bxs-save pe-2'></i>Save</button>
+                            }
+                            @if (_allowupdate)
+                            {
+                                <button class="btn btn-primary btn-sm d-none updatebutton" type="button" id="UpdateBtn"><i class='bx bxs-save pe-2'></i>Update</button>
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div id="workflowstepsDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered" id="workflowsteps-master">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Sort ID</th>
+                                        <th>Workflow Name</th>
+                                        <th>Step Name</th>
+                                        <th>Role Name</th>
+                                        <th>Approval Type</th>
+                                        <th>SLA</th>
+                                        <th>Created DateTime</th>
+                                        <th>Created By</th>
+                                        <th>Updated DateTime</th>
+                                        <th>Updated By</th>
+                                        <th>Section Permission</th>
+                                        <th>Active</th>
+                                        @if (_allowupdate)
+                                        {
+                                            <th>Edit</th>
+                                        }
+                                        @if (_allowdelete)
+                                        {
+                                            <th>delete</th>
+                                        }
+                                   
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Section Permission Modal -->
+<div class="modal fade" id="sectionPermissionModal" tabindex="-1" aria-labelledby="sectionPermissionLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="sectionPermissionLabel">Section Permission</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+               @*  <div class="d-flex justify-content-between mb-3">
+                    
+                    <button class="btn btn-primary" id="addNewSectionBtn">+ Add New Section</button>
+                </div> *@
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" id="sectionPermissionTable">
+                        <thead>
+                            <tr>
+                                <th>WORKFLOW</th>
+                                <th>STEP</th>
+                                <th>SECTION</th>
+                                <th>VISIBLE</th>
+                                <th>ENABLE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                           
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/Workflow/WorkflowSteps.js"></script>
+}

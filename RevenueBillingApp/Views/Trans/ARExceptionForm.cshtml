@@ -1,0 +1,160 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "AR Exception";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link rel="stylesheet" type="text/css" href="~/Public/css/custom-css/Workflow/HistoryCards.css" />
+
+    <link rel="stylesheet" type="text/css" href="~/Public/css/vendors.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/style.css" />
+}
+
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<div class="page-header mb-2">
+    <div class="page-header-left">
+        <div class="page-header-title">
+            <h4 class="m-b-10">Client Onboarding Overview</h4>
+        </div>
+        <p class="mb-0">AR Exception Form</p>
+    </div>
+    <div class="page-header-right ms-auto">
+        <div class="page-header-right-items">
+            <div class="d-flex">
+                <a href="/Trans/ViewARExceptionForm" class="btn btn-indigo btn-sm"><i class="feather-list pe-2"></i>Listing</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header p-0">
+            </div>
+            <div class="card-body">
+                <div id="workflowDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <input type="hidden" id="defaultform" value="@defaultform" />
+
+                        <form id="intiateform" name="intiateform" method="post" action="">
+                            <input type="hidden" value="@wfCode" id="workflow" name="workflow" />
+
+                            <input type="hidden" id="hdnExceptionId" value="@ViewBag.ExceptionId" />
+                            <input type="hidden" id="hdnAction" value="Add" />
+                            <div class="row" id="appendForm">
+                                <div class="nxl-content">
+                                    <div class="main-content">
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="card border-top-0">
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Case Information</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Client <strong style="color:orangered">*</strong></label>
+                                                                <select class="form-select" id="ddlClient" name="ddlClient">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Invoice No <strong style="color:orangered">*</strong></label>
+                                                                <select class="form-select" id="ddlInvoiceNo" name="ddlInvoiceNo">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Amount <strong style="color:orangered">*</strong></label>
+                                                                <input class="form-control" type="number" id="amount">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Days Overdue</label>
+                                                                <input class="form-control" type="number" id="days_overdue">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label w-100">Risk Category <strong style="color:orangered">*</strong></label>
+                                                                <div class="btn-group bg-light px-3 py-1 gap-2" role="group">
+                                                                    <input type="radio" class="btn-check" name="rdoRisk" id="riskLow" autocomplete="off" value="Low">
+                                                                    <label class="btn rounded" for="riskLow">Low</label>
+
+                                                                    <input type="radio" class="btn-check" name="rdoRisk" id="riskMedium" autocomplete="off" checked value="Medium">
+                                                                    <label class="btn rounded" for="riskMedium">Medium</label>
+
+                                                                    <input type="radio" class="btn-check" name="rdoRisk" id="riskHigh" autocomplete="off" value="High">
+                                                                    <label class="btn rounded" for="riskHigh">High</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label w-100">Escalation Level <strong style="color:orangered">*</strong></label>
+                                                                <div class="btn-group bg-light px-3 py-1 gap-2" role="group">
+                                                                    <input type="radio" class="btn-check" name="rdoEscalation" id="rdoSales" autocomplete="off" value="Sales">
+                                                                    <label class="btn rounded" for="rdoSales">Sales</label>
+
+                                                                    <input type="radio" class="btn-check" name="rdoEscalation" id="rdoFinance" autocomplete="off" checked value="Finance">
+                                                                    <label class="btn rounded" for="rdoFinance">Finance</label>
+
+                                                                    <input type="radio" class="btn-check" name="rdoEscalation" id="rdoCEO" autocomplete="off" value="CEO">
+                                                                    <label class="btn rounded" for="rdoCEO">CEO</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="form-label">Notes</label>
+                                                                <textarea class="form-control" rows="3" id="notes"></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            @if (_allowinsert)
+                            {
+                                <br />
+                                <div class="row ">
+                                    @* <div class="d-flex justify-content-end flex-wrap" id="actionId"></div> *@
+                                    <div class="d-flex justify-content-end flex-wrap" id="actionId">
+                                        <button type="button" class="btn btn-success btn-sm SaveBtn" id="SaveBtn"><i class="feather-save pe-2"></i>Save</button>
+
+                                    </div>
+                                </div>
+                            }
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/vendors.min.js"></script>
+    <script src="~/Public/js/common-init.min.js"></script>
+    @* <script src="~/Public/js/client-onboarding.js"></script> *@
+
+    <script src="~/Public/vendor/leaderline/leaderline.js"></script>
+    <script src="~/Public/js/custom-js/Workflow/WorkflowManager.js"></script>
+    <script src="~/Public/js/custom-js/Trans/ARExceptionForm.js"></script>
+}

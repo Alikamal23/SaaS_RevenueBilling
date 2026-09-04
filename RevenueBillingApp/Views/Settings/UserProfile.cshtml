@@ -1,0 +1,129 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "UserProfile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+ 
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    RevenueBillingApp.Models.Authentication.UserInfo userInfo = sessionItems.userInfo;
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+}
+
+@section TopCss{
+    <link href="~/Public/css/custom-css/Settings/UserProfile.css" rel="stylesheet" />
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h5 class="card-title">User Profile</h5>
+            </div>
+            <div class="card-body">
+                <div id="ProfileMasterDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <form id="profilemasterform" name="profilemasterform" method="post" action="">
+                            <div class="row">
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-3 d-block mx-auto profile-col">
+                                    <div class="profile-pic-wrapper">
+                                        <div class="pic-holder">
+                                            <!-- uploaded pic shown here -->
+                                            <img id="profilePic" class="profile-image pic d-block mx-auto" src="~/Public/image/@(userInfo.UserImage == null ? "profile-img.png": "UserImage/" + userInfo.UserImage)">
+
+                                            @* <input class="uploadProfileInput d-block mx-auto" type="file" name="_ImageFile" id="newProfilePhoto" accept="image/*" />
+                                            <label for="newProfilePhoto" class="upload-file-block d-block mx-auto">
+                                                <div class="text-center">
+                                                    <div class="mb-2">
+                                                        <i class='bx bxs-camera'></i>
+                                                    </div>
+                                                    <div class="text-uppercase">
+                                                        Update <br /> Profile Photo
+                                                    </div>
+                                                </div>
+                                            </label> *@
+
+                                            <div class="image-upload-wrap">
+                                                <input class="uploadProfileInput" type="file" name="_ImageFile" id="newProfilePhoto" accept="image/*" />
+                                                <label for="newProfilePhoto" class="upload-file-block d-block mx-auto">
+                                                    <div class="drag-text">
+                                                        <i class="fa-solid fa-camera"></i>
+                                                        <h5 class="pt-2 fw-bold mb-0"> Update Profile Photo</h5>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-9">
+                                    <div class="row">
+                                        <div class="d-none">
+                                            <input type="hidden" id="UserID" name="UserID" value="@userInfo.UserID">
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+                                            <label>User Name</label>
+                                            <input type="text" class="form-control" id="UserName" name="UserName" autocomplete="off" value="@userInfo.UserName" required>
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-6 mt-3 mt-lg-0">
+                                            <label>User Email</label>
+                                            <input type="text" class="form-control email" id="UserEmail" name="UserEmail" value="@userInfo.UserEmail" disabled="disabled" readonly>
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-6 mt-3">
+                                            <label>Role Name</label>
+                                            <input type="text" class="form-control" id="RoleName" name="RoleName" value="@userInfo.RoleName" disabled readonly>
+                                        </div>
+                                        <div class="col-12 col-sm-12 col-md-12 col-lg-6 mt-3">
+                                            <label>Form Name</label>
+                                            <select class="formname form-select" name="FormID" id="FormID" required>
+                                                <option value="">Select Default Form</option>
+                                                @{
+                                                    foreach (RevenueBillingApp.Models.Authentication.RolesMapping mapping in rolesMapping)
+                                                    {
+                                                        if (mapping.FormID == userInfo.DefaultFormID)
+                                                        {
+                                                            try
+                                                            {
+                                                                <option value="@mapping.FormID" selected="selected">@mapping.FormDisplayName</option>
+                                                            }
+                                                            catch
+                                                            {
+                                                                <option value="@mapping.FormID" selected="selected">@mapping.FormName</option>
+                                                            }
+
+                                                        }
+                                                        else
+                                                        {
+                                                            try
+                                                            {
+                                                                <option value="@mapping.FormID">@mapping.FormDisplayName</option>
+                                                            }
+                                                            catch
+                                                            {
+                                                                <option value="@mapping.FormID">@mapping.FormName</option>
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="col-12 mt-3">
+                                            <button class="btn btn-primary btn-sm savebutton d-block ms-auto" id="SaveBtn" type="button"><i class='feather-save me-2'></i>Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS{
+    <script src="~/Public/js/custom-js/Settings/UserProfile.js"></script>
+}

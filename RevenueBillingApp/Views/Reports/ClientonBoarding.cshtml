@@ -1,0 +1,67 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Clint on Boarding";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss {
+    <link href="~/Public/css/custom-css/Reports/_reportcss.css" rel="stylesheet" />
+}
+
+<div class="page-header">
+    <div class="page-header-left d-flex align-items-center">
+        <div class="page-header-title">
+            <h5 class="m-b-10">Client on Boarding Report</h5>
+        </div>
+    </div>
+</div>
+
+<div class="page-section vob mt-2">
+    <form class="needs-validation" id="frm-Idea" novalidate="">
+        <!-- Report Section -->
+        <section class="card custom-card" id="TitleInfo">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-6 col-md-6 mt-2">
+@*                         <div class="row mb-4 align-items-center">
+                            <div class="col-lg-4">
+                                <label for="fullnameInput" class="fw-semibold">Company Name: <strong style="color:orangered">*</strong></label>
+                            </div>
+                            <div class="col-lg-8">
+                                <div class="input-group">
+                                    <div class="input-group-text"><i><input type="checkbox" id="chkCompany" name="chkCompany" value="0"></i></div>
+                                    <select class="form-control" name="ddlCompany" id="ddlCompany" multiple="multiple">
+                                    </select>
+                                </div>
+                            </div>
+                        </div> *@
+                    </div>
+                    <div class="col-sm-6 col-md-6 mt-2">
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="col-sm-12 col-md-12 mt-3 d-flex justify-content-end" id="divActionId">
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="chkShowExcel" style="margin-top: 9px;">
+                        <label class="form-check-label" for="chkShowExcel" style="margin-top: 9px;">
+                            Export Excel
+                        </label>
+                    </div>
+                </div>
+            </div>
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-success" id="btnGetReport"> View Report </button>
+        </div>
+    </form>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/html2pdf.bundle.min.js"></script>
+
+    <script src="~/Public/js/custom-js/Reports/ClientonBoarding.js"></script>
+}

@@ -1,0 +1,43 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "View My Request";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link href="~/Public/css/custom-css/Workflow/HistoryCards.css" rel="stylesheet" />
+}
+
+@{
+
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header p-0">
+               
+            </div>
+            <div class="card-body">
+                <div id="workflowDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <form id="intiateform" name="intiateform" method="post" action="">
+                            <div class="row" id="appendForm">
+                            </div>
+                       </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/vendor/leaderline/leaderline.js"></script>
+    <script src="~/Public/js/custom-js/Workflow/WorkflowManager.js"></script>
+    <script src="~/Public/js/custom-js/Budget/ViewMyRequest.js"></script>
+}

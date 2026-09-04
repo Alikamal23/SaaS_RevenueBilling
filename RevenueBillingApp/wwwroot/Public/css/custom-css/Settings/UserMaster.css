@@ -1,0 +1,56 @@
+.modal-body div div div {
+    max-height: 600px;
+}
+
+
+#ModalActiveDirectoryUsers div {
+    min-width: 1100px;
+}
+
+label {
+    font-size: small;
+}
+
+input, .form-select {
+    font-size: 12px !important;
+}
+
+table tbody td {
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+table.dataTable > thead .sorting:before, table.dataTable > thead .sorting:after, table.dataTable > thead .sorting_asc:before, table.dataTable > thead .sorting_asc:after, table.dataTable > thead .sorting_desc:before, table.dataTable > thead .sorting_desc:after, table.dataTable > thead .sorting_asc_disabled:before, table.dataTable > thead .sorting_asc_disabled:after, table.dataTable > thead .sorting_desc_disabled:before, table.dataTable > thead .sorting_desc_disabled:after {
+    bottom: 0.7em;
+}
+
+table#user-master {
+    border: 1px solid #dee2e6;
+}
+
+#UserMasterDiv .page-link {
+    color: #212529;
+}
+
+    #UserMasterDiv .page-link:hover {
+        color: #fff;
+        background-color: #212529;
+        border-color: #212529;
+    }
+
+    #UserMasterDiv .active > .page-link, #UserMasterDiv .page-link.active {
+        color: #fff;
+    }
+
+.togglepassword {
+    width: 10%;
+    float: left;
+    border-radius: 0;
+    max-height: 32px;
+    font-size: 13px;
+}
+
+.password {
+    width: 90%;
+    float: right;
+}

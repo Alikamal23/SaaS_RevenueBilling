@@ -1,0 +1,140 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Client Invoice Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link href="~/public/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/report.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+
+
+<div class="report-wrapper">
+
+    <!-- ================= REPORT HEADER ================= -->
+    <div class="report-header">
+
+        <div class="report-title-section">
+
+            <div class="report-title">
+                LIST OF ALL CLIENT INVOICE
+            </div>
+
+            <div class="report-subtitle">
+                Client Information Report
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= REPORT PARAMETERS ================= -->
+    <div class="report-parameters ml-2">
+
+        <div class="parameters-title d-flex justify-content-between align-items-center ms-2">
+            <span>Report Parameters</span>
+
+            <div class="report-export-buttons m-1">
+
+                <button type="button" id="btnExportExcel" class="btn btn-sm btn-outline-success report-icon-btn" title="Export to Excel">
+                    <i class="fas fa-file-excel"></i>
+                </button>
+
+                <button type="button" id="btnExportPDF" class="btn btn-sm btn-outline-danger report-icon-btn" title="Export to PDF">
+                    <i class="fas fa-file-pdf"></i>
+                </button>
+
+            </div>
+        </div>
+
+        <div class="row ms-2">
+
+            <div class="col-md-4 p-0">
+                <div class="parameter-label">
+                    Client Name
+                </div>
+                <div class="parameter-value" id="reportClient">New Client Name</div>
+            </div>
+
+            <div class="col-md-4">
+            </div>
+
+            <div class="col-md-4">
+                <div class="parameter-label">
+                    Report Date
+                </div>
+                <div class="parameter-value" id="reportDate">2026-08-12</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= REPORT DATA ================= -->
+    <div class="report-data">
+
+        <div class="table-responsive">
+            <table class="table report-table" id="pdfDatatable">
+                <thead id="tableHeaders">
+                </thead>
+
+                <tbody id="tblChecklist">
+                </tbody>
+
+                <tfoot>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination"
+             class="d-flex justify-content-center mt-3 mb-3">
+        </div>
+
+    </div>
+
+    <!-- ================= REPORT FOOTER ================= -->
+    <div class="report-footer">
+
+        <div class="footer-line"></div>
+
+        <div class="footer-content">
+
+            <span>
+                Generated on:
+                <strong id="generatedDate"></strong>
+            </span>
+
+            <span>
+                Mettis Global | Confidential
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section BottomJS {
+    <script src="~/Public/vendor/html2pdf/html2pdf.bundle.min.js"></script>
+    <script src="~/public/js/jquery.min.js"></script>
+    <script src="~/public/js/custom-js/BillingRevenue/rpt_ClientInvoiceReport.js"></script>
+}

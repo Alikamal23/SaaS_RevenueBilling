@@ -1,0 +1,128 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Workflows";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss 
+{
+    <link href="~/Public/css/custom-css/Workflow/Workflow.css" rel="stylesheet" />
+}
+
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Workflows</h4>
+            </div>
+            <div class="card-body">
+                <form id="workflowform" name="workflowform" method="post" action="">
+                    <div class="row">
+                        <div class="d-none">
+                            <input type="hidden" value="" id="s-workflowid" name="id" />
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                            <label>Workflow Code</label>
+                            <input type="text" class="form-control" id="s-workflowcode" name="workflowcode" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                            <label>Workflow Name</label>
+                            <input type="text" class="form-control" id="s-workflowname" name="workflowname" required>
+                        </div>
+
+
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                            <label>Form Page Url:</label>
+                            <input type="text" class="form-control" id="formpageurl" name="formpageurl" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                            <label>View Page Url:</label>
+                            <input type="text" class="form-control" id="viewpageurl" name="viewpageurl" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                            <label>Task Page Url:</label>
+                            <input type="text" class="form-control" id="taskpageurl" name="taskpageurl" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                            <label>Request Page Url:</label>
+                            <input type="text" class="form-control" id="requestpageurl" name="requestpageurl" required>
+                        </div>
+
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2">
+                            <label class="w-100">Active</label>
+                            <input class="checkboxsize" type="checkbox" id="s-active" name="isactive">
+                        </div>
+                        <div class="col-12 d-flex justify-content-end">
+                            @if (_allowinsert)
+                            {
+                                <button class="btn btn-primary btn-sm savebutton" type="button" id="SaveBtn"><i class='bx bxs-save pe-2'></i>Save</button>
+                            }
+                            @if (_allowupdate)
+                            {
+                                <button class="btn btn-primary btn-sm d-none updatebutton" type="button" id="UpdateBtn"><i class='bx bxs-save pe-2'></i>Update</button>
+                            }
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div id="workflowDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered" id="workflow-master">
+                                <thead>
+                                    <tr>
+                                        <th>Workflow Code</th>
+                                        <th>Workflow Name</th>
+                                        <th>Created DateTime</th>
+                                        <th>Created By</th>
+                                        <th>Updated DateTime</th>
+                                        <th>Updated By</th>
+                                        <th>Active</th>
+                                        @if (_allowupdate)
+                                        {
+                                            <th>Edit</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/Workflow/Workflow.js"></script>
+}

@@ -1,0 +1,117 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Smtp Setting";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss{
+   @*  <link href="~/Public/css/custom-css/Settings/SmtpSetting.css" rel="stylesheet" /> *@
+}
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h4 class="card-title">SMTP Setting</h4>
+            </div>
+            <div class="card-body">
+                <form id="smtpform" name="smtpform">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                            <label>Smtp</label>
+                            <input type="text" class="form-control" id="Smtp" name="Smtp" autocomplete="off" required>
+                        </div>
+
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4 mt-3 mt-lg-0">
+                            <label>Sender Email </label>
+                            <input type="email" class="form-control" id="SenderEmailID" name="SenderEmailID" autocomplete="off" required>
+                        </div>
+
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4 mt-3 mt-lg-0">
+                            <label>User Password</label>
+                            <div>
+                                <span id="Smtptogglepassword" class="px-0 input-group-text d-inline-block togglepassword">
+                                    <i class="feather-eye"></i>
+                                </span>
+                                <input type="password" class="form-control password" id="SmtpPassword" name="SmtpPassword" minlength="8" autocomplete="off" required>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4 mt-3">
+                            <label>Port</label>
+                            <input type="text" class="form-control" id="SmtpPort" name="SmtpPort" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4 mt-3">
+                            <label>Display Name</label>
+                            <input type="text" class="form-control" id="DisplayName" name="DisplayName" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4 mt-3 mt-lg-auto">
+                            <input type="checkbox" id="EnableSSL" name="EnableSSL">
+                            <label>Enable SSL</label>
+                        </div>
+                    </div>
+                </form>
+                <div class="row mt-3">
+                        <div class="col-12">
+                        @if (_allowupdate)
+                        {
+                            <button class="btn btn-primary btn-sm ms-auto updatebutton" id="UpdateBtn" type="button"><i class='feather-save me-2'></i>Update</button>
+                        }
+
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* <div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div id="SmtpMasterDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="role-master">
+                                <thead>
+                                    <tr>
+                                        <th>SMTP</th>
+                                        <th>Email</th>
+                                        <th>Password</th>
+                                        <th>Port</th>
+                                        <th>Display Name</th>
+                                        <th>EnableSSL</th>
+                                        <th>Set Default</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> *@
+
+
+@section BottomJS{
+    <script src="~/Public/js/custom-js/Settings/SmtpSetting.js"></script>
+}

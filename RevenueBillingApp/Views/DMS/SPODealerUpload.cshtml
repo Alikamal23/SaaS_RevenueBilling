@@ -1,0 +1,119 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "SPO Dealer Uploader";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss {
+    <link href="~/Public/css/custom-css/Layout/SPODealerUploader.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h5 class="card-title">SPO Dealer Uploader/Downloader</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Tab Navigation -->
+                    <ul class="nav nav-pills mb-3 dealer-tabs" id="dealerTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active fw-bold"
+                               data-bs-toggle="pill"
+                               data-bs-target="#download"
+                               id="tabDownload">
+                                <i class="fa-solid fa-download pe-1"></i> Download File
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold" data-bs-toggle="pill" href="#upload" id="tabUpload">
+                                <i class="fa-solid fa-upload pe-1"></i> Upload File
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- Download Tab -->
+                        <div class="tab-pane container fade show active" id="download">
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card fixed-width-card">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6 col-lg-4">
+                                                    <label for="dp_DownloadDate" class="form-label">Month :</label>
+                                                    <input type="month" class="form-control" id="dp_DownloadDate">
+                                                </div>
+
+                                                <div class="col-md-6 col-lg-4">
+                                                    <label for="ddl_zone" class="form-label">Zone :</label>
+                                                    <select class="form-control Category" id="ddl_zone" name="ddl_zone"></select>
+                                                </div>
+
+                                                <div class="col-12 text-end mt-4">
+                                                    <button type="button" class="btn btn-primary" id="btnDownloadExcel">
+                                                        <i class="fa-solid fa-file-arrow-down me-1"></i> Download
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Tab -->
+                        <div class="tab-pane container fade" id="upload">
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card fixed-width-card">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-6 col-lg-4">
+                                                    <label for="dp_UploadDate" class="form-label">Month :</label>
+                                                    <input type="month" class="form-control" id="dp_UploadDate">
+                                                </div>
+
+                                                <div class="col-md-6 col-lg-4">
+                                                    <label for="file_uploader" class="form-label">Upload File :</label>
+                                                    <input id="file_uploader" type="file" class="form-control" />
+                                                </div>
+
+                                                <div class="col-12 text-end mt-4">
+                                                    <button type="button" class="btn btn-success" id="btnUploadExcel">
+                                                        <i class="fa-solid fa-cloud-arrow-up me-1"></i> Upload
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/DMS/SPODealerUpload.js"></script>
+}

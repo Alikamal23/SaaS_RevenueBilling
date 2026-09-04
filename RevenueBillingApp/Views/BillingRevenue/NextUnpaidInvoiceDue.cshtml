@@ -1,0 +1,93 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Next Unpaid Invoice Due";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link href="~/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/public/css/vendors.min.css" rel="stylesheet" />
+    <link href="~/public/css/theme.min.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/ReportDashboard.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/report.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/ClientInvoicePrint.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<div class="main-content">
+
+    <!-- ===================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ===================================== -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="page-header-title">
+                <h4 class="m-b-10">Next Unpaid Invoice Due</h4>
+            </div>
+        </div>
+        <div class="page-header-right">
+            <button type="button" class="btn btn-outline-primary" id="btnBackToParameters" style="display:none;">
+                <i class="feather-arrow-left me-2"></i>Back
+            </button>
+        </div>
+    </div>
+
+    <!-- ===================================== -->
+    <!-- FILTER PANEL -->
+    <!-- ===================================== -->
+    <div class="card mt-3" id="reportFilterCard">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="feather-filter me-2"></i>
+                Filter Parameters
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Client:</label>
+                    <select class="form-select" id="ddlDueClient">
+                        <option value="0">Please select</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Month:</label>
+                    <input type="month" class="form-control" id="txtDueMonth" />
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12 d-flex justify-content-end">
+                    <button type="button" class="btn btn-success" id="btnViewDueInvoice">
+                        <i class="feather-bar-chart-2 me-2"></i>
+                        View Due Invoice
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================== -->
+    <!-- REPORT RESULT (View click ke baad fill hoga) -->
+    <!-- ===================================== -->
+    <div id="reportResult" class="mt-4 pb-3" style="display:none;"></div>
+
+</div>
+
+@section BottomJS {
+    <script src="~/public/js/custom-js/BillingRevenue/NextUnpaidInvoiceDue.js"></script>
+}

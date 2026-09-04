@@ -1,0 +1,67 @@
+﻿body {
+    background: #f4f6f9;
+    font-family: Calibri, Arial, sans-serif;
+    font-size: 14px;
+}
+
+.report-header {
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 190px;
+}
+
+.report-card {
+    border: 1px solid #dcdcdc;
+}
+
+    .report-card .card-header {
+        background: #0d6efd;
+        color: #fff;
+        font-weight: 600;
+        font-size: 17px;
+    }
+
+.table th {
+    background: #f8f9fa;
+    width: 18%;
+}
+
+.table td,
+.table th {
+    vertical-align: middle;
+}
+
+@media print {
+
+    body {
+        background: #fff;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .report-card {
+        page-break-inside: avoid;
+    }
+
+    @page {
+        size: A4;
+        margin: 10mm;
+    }
+}
+
+.no-print .btn {
+    display: inline-flex !important;
+    align-items: center;
+}
+
+.no-print .d-flex {
+    display: flex !important;
+}
+
+.no-print .gap-2 {
+    gap: 8px;
+}

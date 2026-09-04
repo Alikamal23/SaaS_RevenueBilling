@@ -1,0 +1,171 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "WorkFlowStepAction";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+        <link href="~/Public/css/custom-css/Workflow/WorkFlowStepAction.css" rel="stylesheet" />
+}
+
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Create Action</h4>
+            </div>
+            <div class="card-body">
+                <form id="workflowstepsActionform" name="workflowstepsActionform" method="post" action="">
+                    <div class="row">
+                        <div class="d-none">
+                            <input type="hidden" value="" id="s-workflowstepActionid" name="id" />
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3 mt-auto mt-lg-3 ">
+                            <label class="w-100">Workflow Code</label>
+                            <select class="form-select" id="Workflowcode" name="workflowcode" required>
+                                <option value="">Select Workflow Code</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3 mt-auto mt-lg-3">
+                            <label>Action Title</label>
+                            <input type="text" class="form-control" id="s-workflowstepaction" name="actionname" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3 mt-auto mt-lg-3">
+                            <label>Workflow step</label>
+                            <select class="form-select" id="s-workflowstepid" name="workflowstepid" required disabled>
+                                <option value="">Select Workflow step</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3 mt-auto mt-lg-3">
+                            <label class="w-100">Workflow Next step</label>
+                            <select class="form-select" id="s-workflownextstepid" name="workflownextstepid" required disabled>
+                                <option value="">Select Next Step</option>
+                            </select>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3 mt-auto mt-lg-3" hidden>
+                            <label class="w-100">Action Type</label>
+                            <select class="form-select" id="actiontype" name="actiontype">
+                                <option value="Single" selected>Single</option>
+                                <option value="ALL Same">All Same</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3 mt-auto mt-lg-3">
+                            <div class="assignment-type-group">
+                                <label class="assignment-label">Next AssignmentType:</label>
+
+                                <div class="assignment-option">
+                                    <input type="radio" id="staticRole" name="assignmentType" value="static" checked>
+                                    <label for="staticRole">Static Role</label>
+                                </div>
+
+                                <div class="assignment-option">
+                                    <input type="radio" id="dynamicRole" name="assignmentType" value="dynamic">
+                                    <label for="dynamicRole">Dynamic Role</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3 mt-auto mt-lg-3">
+                            <label class="w-100">Dynamic Type</label>
+                            <select class="form-select" id="nexttype" name="nexttype"  >
+                                <option value="0">Select Dynamic Type</option>
+                            </select>
+                        </div>
+
+
+
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2 d-flex align-items-center gap-2">
+                            <label for="s-active" class="mb-0">Active</label>
+                            <input class="checkboxsize" type="checkbox" id="s-active" name="isactive">
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2 d-flex align-items-center gap-2">
+                            <label for="issave" class="mb-0">IsSave</label>
+                            <input class="checkboxsize" type="checkbox" id="issave" name="issave" value="false">
+                        </div>
+
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2 d-flex align-items-center gap-2">
+                            <label for="ismove" class="mb-0">IsMove</label>
+                            <input class="checkboxsize" type="checkbox" id="ismove" name="ismove" value="false">
+                        </div>
+
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4 mt-auto mt-lg-3">
+                            @if (_allowinsert)
+                            {
+                                <button class="btn btn-primary btn-sm savebutton" type="button" id="SaveBtn"><i class='bx bxs-save pe-2'></i>Save</button>
+                            }
+                            @if (_allowupdate)
+                            {
+                                <button class="btn btn-primary btn-sm d-none updatebutton" type="button" id="UpdateBtn"><i class='bx bxs-save pe-2'></i>Update</button>
+                            }
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div id="workflowstepsActionDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered" id="workflowstepsaction-master">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Action Name</th>
+                                        <th>Step Name</th>
+                                        <th>Next Step Name</th>
+                                        <th>Created DateTime</th>
+                                        <th>Created By</th>
+                                        <th>IsSave</th>
+                                        <th>IsMove</th>
+                                        <th>Active</th>
+                                        @if (_allowupdate)
+                                        {
+                                                <th>Edit</th>
+                                        }
+                                        @if (_allowdelete)
+                                        {
+                                                <th>delete</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/Workflow/WorkFlowStepAction.js"></script>
+}

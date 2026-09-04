@@ -1,0 +1,63 @@
+{
+  "profiles": {
+    "http": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "weatherforecast",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5090"
+    },
+    "https": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "AM_SALT_SIZE": "32",
+        "AM_KEY_SIZE": "64",
+        "AM_ITERATIONS": "15000",
+        "AM_ENCRYPTION_KEY": "M@Kv2$PBn!992!2-2024",
+        "AM_CHAR_SET": "ThI$I$R@nD0MKeYGeNeR@T0RbY$@L@R",
+        "AM_FOLDERPATH": "C:\\Websites\\MUFA\\API",
+        "AM_CONNECT_SRC": "https://localhost:7163 wss://localhost:7163/signalr",
+        "AM_SERVICE_URL": "https://localhost:7163/api/",
+        "AM_TARGET_API": "https://localhost:7163",
+        
+        //local db
+        "AM_DATABASE": "w11Hxo/pGLufqhu/.MhAZ7YyNWF8BK3FwoklNpV8JdizHFii5py4quLs6oarCCeSWBb747Jw/syO+qzd+LiVBVX5R/wrGLiJAk3d4N+nueG/DC3H5qDYaQFVE98AcIjVL9wkvBT9qpzdb0UMtjM87IA==.e7uxZZGXqzsfaN4pxvEsKg==",
+
+        // staging db
+        //"AM_DATABASE": "sNSxeNtp5JOnkhy5.5mTt9nWvLikoZtdywB7eLnyL9vZ/imy2iMHFy3pLeiytJkX+w1U/BcDipxUoh11MYckZBimvDx+L3WSnRHWhKgubQCb+WPywidTxqqfMFtUAJrLpYHFn2yiUNd4ovLqY7OiF9AXYHX5HSKUH3JcxO6y7zJY+CT8GnQDaQ/lVchvESMTJ8MYC3fPIebN1+y+N+nPzIQ==.Hbr0/r3vGpTbekRI9B1e+g==",
+        
+
+        "AM_JWT_KEY": "$M!G-SF12345%,dns1.namingserver1.com",
+        "AM_JWT_ISSUER": "https://contabo.net/",
+        "AM_JWT_AUDIENCE": "contabo.net",
+        "AM_VIEWURL": "https://localhost:7201",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "xpt956wxp": "MAKV2SPBNI99212"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7163;http://localhost:5090"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:55749",
+      "sslPort": 44387
+    }
+  }
+}

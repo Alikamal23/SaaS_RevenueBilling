@@ -1,0 +1,97 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "ClientOnboarding";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link href="~/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/public/css/vendors.min.css" rel="stylesheet" />
+    <link href="~/public/vendor/jquery-steps/jquery.steps.min.css" rel="stylesheet" />
+    <link href="~/public/css/theme.min.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/ClientOnboarding.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/ClientInvoicePrint.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<div class="page-header">
+    <div class="page-header-left">
+        <div class="page-header-title">
+            <h4 class="m-b-10">Client Contract List</h4>
+        </div>
+    </div>
+</div>
+
+<div class="page-section vob mt-2">
+    <form class="needs-validation" id="frm-Idea" novalidate="">
+        <!-- Report Section -->
+        <section class="card custom-card" style="margin-bottom:7px;" id="TitleInfo">
+            <div class="card-body">
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-sm-6 col-md-6 mt-2">
+                                <div class="row mb-4 align-items-center">
+                                    <div class="col-lg-4">
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <div class="d-flex align-items-center">
+
+                                            <label class="form-label mb-0 me-2">
+                                                Client:
+                                            </label>
+
+                                            <select class="form-select" id="ddlClient" name="ddlClient">
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-md-6 mt-2">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="col-sm-12 col-md-12 mt-3 d-flex justify-content-end" id="divActionId">
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="chkShowExcel">
+                        <label class="form-check-label" for="chkShowExcel">
+                            Export Excel
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            &nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-success btn-sm btnGetReport" id="btnGetReport"><i class="fa-solid fa-chart-column me-2"></i> View Report </button>
+        </div>
+    </form>
+</div>
+
+
+@section BottomJS {
+    <script src="~/public/js/custom-js/BillingRevenue/ClientContractReport.js"></script>
+}

@@ -1,0 +1,125 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Voucher Type Master";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss {
+    <link href="~/Public/css/custom-css/MasterSetup/VoucherType.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+
+<div class="row d-none">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h5 class="card-title">Voucher Type Master</h5>
+            </div>
+
+            <div class="card-body">
+                <form id="masterform" name="masterform" method="post" action="" autocomplete="off">
+                    <div class="row">
+                        <div class="d-none col-12 col-sm-12 col-md-12 col-lg-3">
+                            <input type="text" class="form-control" id="EditID" name="EditID" value="">
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>VType Code <span class="required-star">*</span></label>
+                            <input type="text" class="form-control" id="VTypeCode" name="VTypeCode" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>VType Desc <span class="required-star">*</span></label>
+                            <input type="text" class="form-control" id="VTypeDesc" name="VTypeDesc" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Nature</label>
+                            <input type="text" class="form-control" id="Nature" name="Nature" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-2 mt-3 mt-lg-auto">
+                            <input type="checkbox" id="IsActive" name="IsActive" checked>
+                            <label>Active</label>
+                        </div>
+                    </div>
+
+@*                     <div class="row mt-3">
+                        <div class="col-12 d-flex justify-content-end">
+                            @if (_allowinsert)
+                            {
+                                <button class="btn btn-primary btn-sm savebutton" id="SaveBtn" type="button"><i class='feather-save me-2'></i>Save</button>
+                            }
+                            @if (_allowupdate)
+                            {
+                                <button class="btn btn-primary btn-sm d-none updatebutton" id="UpdateBtn" type="button"><i class='feather-save me-2'></i>Update</button>
+                            }
+                            <button class="btn btn-danger btn-sm ms-2 clearbutton" id="ClearBtn" type="button"><i class='feather-x me-2'></i>Clear</button>
+                        </div>
+                    </div> *@
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+
+        <div class="card stretch stretch-full">
+
+        <div class="card-header">
+            <h5 class="card-title">Voucher Type Master</h5>
+        </div>
+
+        <div class="card-body">
+            <div class="card-body p-0">
+                <div id="UserMasterDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <table class="table table-hover" id="user-master">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Voucher Type Description</th>
+                                    <th>Nature</th>
+                                    <th>Is Active</th>
+@*                                     @if (_allowupdate)
+                                    {
+                                        <th>Edit</th>
+                                    }
+                                    @if (_allowdelete)
+                                    {
+                                        <th>Delete</th>
+                                    } *@
+
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/MasterSetup/VoucherType.js"></script>
+}
+

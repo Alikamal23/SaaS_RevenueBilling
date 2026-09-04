@@ -1,0 +1,176 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Billing Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link rel="stylesheet" type="text/css" href="~/Public/css/custom-css/Workflow/HistoryCards.css" />
+
+    <link rel="stylesheet" type="text/css" href="~/Public/css/vendors.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/style.css" />
+}
+
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<div class="page-header mb-2">
+    <div class="page-header-left">
+        <div class="page-header-title">
+            <h4 class="m-b-10">Client Onboarding Overview</h4>
+        </div>
+        <p class="mb-0">Billing Profile Information</p>
+    </div>
+    <div class="page-header-right ms-auto">
+        <div class="page-header-right-items">
+            <div class="d-flex">
+                <a href="/Trans/ViewBillingProfile" class="btn btn-indigo btn-sm"><i class="feather-list pe-2"></i>Listing</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header p-0">
+            </div>
+            <div class="card-body">
+                <div id="workflowDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <input type="hidden" id="defaultform" value="@defaultform" />
+
+                        <form id="intiateform" name="intiateform" method="post" action="">
+                            <input type="hidden" value="@wfCode" id="workflow" name="workflow" />
+
+                            <input type="hidden" id="hdnBillingId" value="@ViewBag.BillingId" />
+                            <input type="hidden" id="hdnAction" value="Add" />
+                            <div class="row" id="appendForm">
+                                <div class="nxl-content">
+                                    <div class="main-content">
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="card border-top-0">
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Client Info</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Client <strong style="color:orangered">*</strong></label>
+                                                                <select class="form-select" id="ddlClient" name="ddlClient">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Contract <strong style="color:orangered">*</strong></label>
+                                                                <select class="form-select" id="ddlContract" name="ddlContract">
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Core Billing Details</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Billing Type</label>
+                                                                <select class="form-select" id="ddlBillingType">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Billing Frequency (if recurring)</label>
+                                                                <select class="form-select" id="ddlBillingFreqRecurring">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Next Billing Date</label>
+                                                                <input class="form-control" type="date" id="next_billing_date">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Invoicing Preferences</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6">
+                                                                <label class="form-label w-100">Billing Method <strong style="color:orangered">*</strong></label>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="bill_method" id="rdoAuto" value="Auto">
+                                                                    <label class="form-check-label" for="rdoAuto">Auto Invoice</label>
+                                                                </div>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="bill_method" id="rdoManual" value="Manual">
+                                                                    <label class="form-check-label" for="rdoManual">Manual Invoice</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-md-6">
+                                                                <label class="form-label w-100">Invoice Delivery Method <strong style="color:orangered">*</strong></label>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="delivery_method" id="rdoDeliveryEmail" value="Email">
+                                                                    <label class="form-check-label" for="rdoDeliveryEmail">Email</label>
+                                                                </div>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="delivery_method" id="rdoDeliveryPortal" value="Portal">
+                                                                    <label class="form-check-label" for="rdoDeliveryPortal">Portal</label>
+                                                                </div>
+                                                                <div class="form-check form-check-inline">
+                                                                    <input class="form-check-input" type="radio" name="delivery_method" id="rdoDeliveryManual" value="Manual">
+                                                                    <label class="form-check-label" for="rdoDeliveryManual">Manual</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            @if (_allowinsert)
+                            {
+                                <br />
+                                <div class="row ">
+                                    @* <div class="d-flex justify-content-end flex-wrap" id="actionId"></div> *@
+                                    <div class="d-flex justify-content-end flex-wrap" id="actionId">
+                                        <button type="button" class="btn btn-success btn-sm SaveBtn" id="SaveBtn"><i class="feather-save pe-2"></i>Save</button>
+
+                                    </div>
+                                </div>
+                            }
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/vendors.min.js"></script>
+    <script src="~/Public/js/common-init.min.js"></script>
+
+    <script src="~/Public/vendor/leaderline/leaderline.js"></script>
+    <script src="~/Public/js/custom-js/Workflow/WorkflowManager.js"></script>
+    <script src="~/Public/js/custom-js/Trans/BillingProfile.js"></script>
+}

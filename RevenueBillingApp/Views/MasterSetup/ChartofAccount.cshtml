@@ -1,0 +1,343 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Chart of Account";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss {
+    <link href="~/Public/css/custom-css/MasterSetup/ChartofAccount.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header btn-style-right">
+                <h5 class="card-title">Chart of Account</h5>
+              @*   <button class="btn btn-primary" id="btnAddNew" type="button"><i class='feather-user me-2'></i>Add New</button> *@
+
+                <div class="right-buttons">
+                    <button class="btn btn-primary btn-level-style" id="btnLevel2" type="button">
+                        <i class='feather-align-justify me-2'></i>Level II
+                    </button>
+
+                    <button class="btn btn-primary btn-level-style" id="btnLevel3" type="button">
+                        <i class='feather-align-justify me-2'></i>Level III
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form id="masterform" name="masterform" method="post" action="" autocomplete="off">
+                    <input type="hidden" id="pkID" value="0" />
+                    <input type="hidden" id="modalAction">
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="ddlFC">Financial Category:</label>
+                            <select class="form-control" name="ddlFC" id="ddlFC">
+                                <option value="0" selected>Select Voucher Type</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" for="txtNature">Nature:</label>
+                            <input class="form-control" id="txtNature" disabled value="Debit" />
+                        </div>
+
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label" for="ddlAccount">Level II Name: <strong style="color:orangered">*</strong></label>
+                            <select class="form-control" name="ddlAccount" id="ddlAccount">
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="txtGLCodeA">GL Code: </label>
+                            <input class="form-control" id="txtGLCodeA" disabled placeholder="00-00" />
+                        </div>
+
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label" for="ddlCategory">Level III Name: <strong style="color:orangered">*</strong></label>
+                            <select class="form-control" name="ddlCategory" id="ddlCategory">
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="txtGLCodeB">GL Code: </label>
+                            <input class="form-control" id="txtGLCodeB" disabled placeholder="00-00-00" />
+                        </div>
+
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label" for="txtNameL4">Level IV Name: <strong style="color:orangered">*</strong></label>
+                            <input class="form-control" id="txtNameL4" />
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" for="txtGLCodeC">GL Code: </label>
+                            <input class="form-control" id="txtGLCodeC" disabled placeholder="00-00-00-00" />
+                        </div>
+
+                        <div class="form-group row">
+                            <div class="col-sm-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="chkForCB">
+                                    <label class="form-check-label" for="chkForCB">
+                                        For Cash / Bank
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-2 mt-3 mt-lg-auto">
+                            <input type="checkbox" id="IsActive" name="IsActive" checked>
+                            <label>Active</label>
+                        </div>
+
+
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-12 d-flex justify-content-end">
+                            @if (_allowinsert)
+                            {
+                                <button class="btn btn-primary btn-sm savebutton" id="SaveBtn" type="button"><i class='feather-save me-2'></i>Save</button>
+                            }
+                            @if (_allowupdate)
+                            {
+                                <button class="btn btn-primary btn-sm d-none updatebutton" id="UpdateBtn" type="button"><i class='feather-save me-2'></i>Update</button>
+                            }
+                            <button class="btn btn-danger btn-sm ms-2 clearbutton" id="ClearBtn" type="button"><i class='feather-x me-2'></i>Clear</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div id="UserMasterDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <table class="table table-hover" id="user-master">
+                            <thead>
+                                <tr>
+                                    <th>Head Name</th>
+                                    <th>GL Code</th>
+                                    <th>CB</th>
+                                    <th>Category</th>
+                                    <th>Account</th>
+                                    <th>FC</th>
+                                    <th>Is Active</th>
+@*                                     @if (_allowupdate)
+                                    {
+                                        <th>Edit</th>
+                                    }
+                                    @if (_allowdelete)
+                                    {
+                                        <th>Delete</th>
+                                    } *@
+
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- #Modal Level2 Account-->
+<div class="modal fade  bd-example-modal-lg" id="myL2Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLevel2">Add New Account (Level II)</h5>
+                <button type="button" class="btn-close closebtn" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="pkIDL2" value="0" />
+                <input type="hidden" id="modalActionL2">
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="ddlFCL2">Financial Category:</label>
+                        <select class="form-control" name="ddlFCL2" id="ddlFCL2">
+                            <option value="0" selected>Select Voucher Type</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="txtNatureL2">Nature:</label>
+                        <input class="form-control" id="txtNatureL2" disabled value="Debit" />
+                    </div>
+
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label" for="txtNameL2">Level II Name: <strong style="color:orangered">*</strong></label>
+                        <input class="form-control" id="txtNameL2" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="txtGLCodeL2">GL Code: </label>
+                        <input class="form-control" id="txtGLCodeL2" disabled placeholder="00-00" />
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm btnSaveL2" id="btnSaveL2"><i class="feather-save pe-2"></i>Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- #Modal Level3 Category-->
+<div class="modal fade  bd-example-modal-lg" id="myL3Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLevel3">Add New Category (Level III)</h5>
+                <button type="button" class="btn-close closebtn" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="pkIDL3" value="0" />
+                <input type="hidden" id="modalActionL3">
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="ddlFCL3">Financial Category:</label>
+                        <select class="form-control" name="ddlFCL3" id="ddlFCL3">
+                            <option value="0" selected>Select Voucher Type</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="txtNatureL3">Nature:</label>
+                        <input class="form-control" id="txtNatureL3" disabled value="Debit" />
+                    </div>
+
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label" for="ddlAccountL3">Level II Name: <strong style="color:orangered">*</strong></label>
+                        <select class="form-control" name="ddlAccountL3" id="ddlAccountL3">
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="txtGLCodeAccountL3">GL Code: <strong style="color:orangered">*</strong></label>
+                        <input class="form-control" id="txtGLCodeAccountL3" disabled placeholder="00-00" />
+                    </div>
+
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label" for="txtNameL3">Level III Name: <strong style="color:orangered">*</strong></label>
+                        <input class="form-control" id="txtNameL3" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="txtGLCodeL3">GL Code: </label>
+                        <input class="form-control" id="txtGLCodeL3" disabled placeholder="00-00-00" />
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm btnSaveL3" id="btnSaveL3"><i class="feather-save pe-2"></i>Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- #Modal Level4 Head-->
+<div class="modal fade  bd-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel">Add New Category Head (Level IV)</h5>
+                <button type="button" class="btn-close closebtn" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="pkID" value="0" />
+                <input type="hidden" id="modalAction">
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="ddlFC">Financial Category:</label>
+                        <select class="form-control" name="ddlFC" id="ddlFC">
+                            <option value="0" selected>Select Voucher Type</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="txtNature">Nature:</label>
+                        <input class="form-control" id="txtNature" disabled value="Debit" />
+                    </div>
+
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label" for="ddlAccount">Level II Name: <strong style="color:orangered">*</strong></label>
+                        <select class="form-control" name="ddlAccount" id="ddlAccount">
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="txtGLCodeA">GL Code: </label>
+                        <input class="form-control" id="txtGLCodeA" disabled placeholder="00-00" />
+                    </div>
+
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label" for="ddlCategory">Level III Name: <strong style="color:orangered">*</strong></label>
+                        <select class="form-control" name="ddlCategory" id="ddlCategory">
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="txtGLCodeB">GL Code: </label>
+                        <input class="form-control" id="txtGLCodeB" disabled placeholder="00-00-00" />
+                    </div>
+
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label" for="txtNameL4">Level IV Name: <strong style="color:orangered">*</strong></label>
+                        <input class="form-control" id="txtNameL4" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label" for="txtGLCodeC">GL Code: </label>
+                        <input class="form-control" id="txtGLCodeC" disabled placeholder="00-00-00-00" />
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkForCB">
+                                <label class="form-check-label" for="chkForCB">
+                                    For Cash / Bank
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm btnSave" id="btnSave"><i class="feather-save pe-2"></i>Save</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/MasterSetup/ChartofAccount.js"></script>
+}
+

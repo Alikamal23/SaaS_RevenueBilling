@@ -1,0 +1,292 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Credit Voucher";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss {
+    <link href="~/Public/css/custom-css/Trans/CreditVoucher.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h5 class="card-title">Credit Voucher</h5>
+                <button class="btn btn-primary" id="btnAddNew" type="button"><i class='feather-plus me-2'></i>Add New</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div id="UserMasterDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <table class="table table-hover" id="user-master">
+                            <thead>
+                                <tr>
+                                    <th>VType</th>
+                                    <th>VCode</th>
+                                    <th>VDate</th>
+                                    <th>Debit Head</th>
+                                    <th>Debit Amount</th>
+                                    <th>Narration</th>
+                                    @if (_allowupdate)
+                                    {
+                                        <th>Edit</th>
+                                    }
+                                    @if (_allowdelete)
+                                    {
+                                        <th>Delete</th>
+                                    }
+
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- #Modal Debit Voucher Head-->
+<div class="modal fade  bd-example-modal-xl" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel">Add New Debit Voucher</h5>
+                <button type="button" class="btn-close closebtn" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="pkID" value="0" />
+                <input type="hidden" id="modalAction">
+                <input type="hidden" id="PK_HiddenID">
+
+                <form class="needs-validation" id="frm-Idea" novalidate="">
+                    <!-- Voucher Section -->
+                    <section id="TitleInfo">
+                        <div class="row">
+                            <input type="hidden" class="form-control" id="txtPrimaryField">
+
+                            <input type="hidden" class="form-control" id="txtVtype">
+                            <input type="hidden" class="form-control" id="txtVcode">
+
+                            <div class="col-sm-6 col-md-6 mt-2">
+                                <div class="row mb-4 align-items-center">
+                                    <div class="col-lg-4">
+                                        <label for="fullnameInput" class="fw-semibold">V Type: <strong style="color:orangered">*</strong></label>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <div class="input-group">
+                                            <div class="input-group-text"><i class="feather-home"></i></div>
+                                            <select class="form-control" name="ddlVType" id="ddlVType">
+                                                <option value="0" selected>Please select</option>
+                                            </select>
+                                            &nbsp;&nbsp;
+                                            <input type="text" class="form-control" id="txtVCode" value="" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-md-6 mt-2">
+                                <div class="row mb-4 align-items-center">
+                                    <div class="col-lg-4">
+                                        <label for="fullnameInput" class="fw-semibold">Voucher Date: <strong style="color:orangered">*</strong></label>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <div class="input-group">
+                                            <div class="input-group-text"><i class="feather-home"></i></div>
+                                            <input type="date" class="form-control" id="txtVDate" value="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6 col-md-6 mt-2">
+                                <div class="row mb-4 align-items-center">
+                                    <div class="col-lg-4">
+                                        <label for="fullnameInput" class="fw-semibold">Debit Head: <strong style="color:orangered">*</strong></label>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <div class="input-group">
+                                            <div class="input-group-text"><i class="feather-home"></i></div>
+                                            <select class="form-control" name="ddlDrHead" id="ddlDrHead">
+                                                <option value="0" selected>Please select</option>
+                                            </select>
+                                            <input type="hidden" class="form-control" id="txtMasterCategoryId" value="" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 col-md-6 mt-2">
+                                <div class="row mb-4 align-items-center">
+                                    <div class="col-lg-4">
+                                        <label for="fullnameInput" class="fw-semibold">Total Amount: </label>
+                                    </div>
+                                    <div class="col-lg-8">
+                                        <div class="input-group">
+                                            <div class="input-group-text"><i class="feather-home"></i></div>
+                                            <input type="text" class="form-control" id="txtTotalAmount" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <input type="hidden" class="form-control" id="txtPrimaryField">
+                            <div class="col-sm-12 col-md-12 mt-2">
+                                <div class="row align-items-center">
+                                    <div class="col-lg-2">
+                                        <label for="fullnameInput" class="fw-semibold">Narration: <strong style="color:orangered">*</strong></label>
+                                    </div>
+                                    <div class="col-lg-10">
+                                        <div class="input-group">
+                                            <div class="input-group-text"><i class="feather-home"></i></div>
+                                            <input type="text" class="form-control" id="txtNarration" value="">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <!-- Voucher detail Section -->
+                    <section id="DetailSection" class="card bottom-card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-12 col-md-3">
+                                    <label class="form-label">Head <strong style="color:orangered">*</strong></label>
+                                    <select class="form-control" name="ddlHead" id="ddlHead">
+                                    </select>
+                                    <input type="hidden" class="form-control" id="txtDetailCategoryId" disabled>
+                                </div>
+
+                                <div class="col-sm-12 col-md-3">
+                                    <label class="form-label">Remarks <strong style="color:orangered">*</strong></label>
+                                    <input type="text" class="form-control" id="txtRemarks" />
+                                </div>
+
+                                <div class="col-sm-12 col-md-3">
+                                    <label class="form-label">Job No <strong style="color:orangered">*</strong></label>
+                                    <select class="form-control" name="ddlJob" id="ddlJob">
+                                        <option value="0" selected>Please select</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-sm-12 col-md-3">
+                                    <label class="form-label">Chq No </label>
+                                    <input type="number" class="form-control" id="txtChqNo" />
+                                </div>
+
+                                <div class="col-sm-12 col-md-3">
+                                    <label class="form-label">Chq Date </label>
+                                    <input type="date" class="form-control" id="txtChqDate" />
+                                </div>
+
+                                <div class="col-sm-12 col-md-3">
+                                    <label class="form-label">Credit Amount <strong style="color:orangered">*</strong></label>
+                                    <input type="text" class="form-control" id="txtAmount" />
+                                </div>
+
+                                <div class="col-sm-12 col-md-4 mt-md-auto">
+                                    <div class="form-check form-check-inline pt-2">
+                                        <input class="form-check-input rdo1" type="radio" id="rdoHead" value="Head" name="headType" checked>
+                                        <label class="form-check-label" for="rdoHead">Head</label>
+                                    </div>
+                                    <div class="form-check form-check-inline pt-2">
+                                        <input class="form-check-input rdo1" type="radio" id="rdoParty" value="Party" name="headType">
+                                        <label class="form-check-label" for="rdoParty">Party</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input rdo1" type="radio" id="rdoEmployee" value="Employee" name="headType">
+                                        <label class="form-check-label" for="rdoEmployee">Employee</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12 col-md-2 mt-md-auto">
+                                    <button type="button" class="btn btn-primary d-block ms-auto" id="btnAddAB">
+                                        <i class="fas fa-plus pe-2"></i> ADD
+                                    </button>
+                                </div>
+
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-sm-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered" id="DetailSectionID">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">S. No.</th>
+                                                    <th class="text-center" hidden>Category Code</th>
+                                                    <th class="text-center">Head Code</th>
+                                                    <th class="text-center">Head Name</th>
+                                                    <th class="text-center">Remarks</th>
+                                                    <th class="text-center">Head Type</th>
+                                                    <th class="text-center">Job No</th>
+                                                    <th class="text-center">Chq No</th>
+                                                    <th class="text-center">Chq Date</th>
+                                                    <th class="text-center">Credit Amount</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                @if (_allowinsert)
+                {
+                    <button type="button" class="btn btn-success btn-sm SaveBtn" id="SaveBtn"><i class="feather-save pe-2"></i>Save</button>
+                }
+                @if (_allowupdate)
+                {
+                    <button class="btn btn-primary btn-sm d-none  updatebutton" id="UpdateBtn" type="button"><i class='feather-save me-2'></i>Update</button>
+                }
+                <button class="btn btn-danger btn-sm ms-2 clearbutton" id="ClearBtn" type="button"><i class='feather-x me-2'></i>Clear</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/Trans/CreditVoucher.js"></script>
+}

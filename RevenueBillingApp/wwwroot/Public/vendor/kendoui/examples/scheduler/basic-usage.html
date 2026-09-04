@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Basic usage</title>
+    <meta charset="utf-8" />
+    <link
+      href="../content/shared/styles/examples-offline.css"
+      rel="stylesheet"
+    />
+    <link href="../../styles/kendo.common.min.css" rel="stylesheet" />
+    <link href="../../styles/kendo.rtl.min.css" rel="stylesheet" />
+    <link href="../../styles/kendo.default.min.css" rel="stylesheet" />
+    <link href="../../styles/kendo.default.mobile.min.css" rel="stylesheet" />
+    <script src="../../js/jquery.min.js"></script>
+    <script src="../../js/jszip.min.js"></script>
+    <script src="../../js/kendo.all.min.js"></script>
+    <script src="../../js/kendo.timezones.min.js"></script>
+    <script src="../content/shared/js/console.js"></script>
+
+    <style>
+      #team-schedule {
+        /* background: url('../content/web/scheduler/team-schedule.png') transparent no-repeat; */
+        height: 115px;
+        position: relative;
+      }
+      .checkDesign {
+        margin-right: 10px;
+      }
+      .larger {
+        transform: scale(1.5);
+        background-color: antiquewhite !important;
+        border-color: red;
+        margin: 15px 05px 0px 15px;
+      }
+      .k-scheduler-yearview .k-day-indicator {
+        width: 20px;
+        height: 20px;
+        border-radius: 20% !important;
+        position: absolute;
+        top: calc(100% - 2em);
+        left: calc(50% - 10.7px);
+        border: 1px solid #f35800;
+        background-color: unset;
+      }
+    
+    </style>
+  </head>
+
+  <body>
+    <div id="example">
+      <div id="scheduler"></div>
+      <div id="team-schedule">
+        <div id="people">
+       
+        </div>
+      </div>
+    </div>
+
+    <script>
+      var color = [
+        "#6b5b95",
+        "#fe9365",
+        "#01a9ac",
+        "#fe5d70",
+        "#BDC3C7",
+        "#1ABC9C",
+        "#2ECC71",
+        "#F1C40F",
+        "#6eb3fa",
+      ];
+
+      var tasks = [];
+
+      var groupColors = [];
+
+      function setGroupColors(tasks) {
+        for (let index = 0; index < tasks.length; index++) {
+          var object = {
+            text: tasks[index].ownerName,
+            value: tasks[index].ownerId,
+            color: color[tasks[index].ownerId],
+          };
+
+          if (groupColors.find((o) => o.value === object.value)) {
+          } else {
+            groupColors.push(object);
+          }
+        }
+      }
+
+      function getData() {
+        $.ajax({
+          type: "GET",
+          contentType: "application/json;charset=utf-8",
+          dataType: "json",
+          url: "http://localhost:19518/api/Dashboard/GetTimeSchedularData",
+          success: function (response) {
+            tasks = response.data;
+            setGroupColors(tasks);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+          cache: false,
+          async: false,
+        });
+      }
+
+      $(function () {
+        getData();
+        CreateCheckField();
+        $("#scheduler").kendoScheduler({
+          date: new Date(),
+          startTime: new Date(),
+          height: 600,
+          views: [
+            "day",
+            "week",
+            "month",
+            "year",
+            { type: "month", selected: true },
+            // "agenda",
+            // { type: "timeline", eventHeight: 50 },
+          ],
+          timezone: "Asia/Karachi",
+          dataSource: tasks,
+          editable: {
+            move: false,
+            destroy: false,
+          },
+          resources: [
+            {
+              field: "ownerId",
+              title: "Owner",
+              dataSource: groupColors,
+            },
+          ],
+          edit: function (e) {
+            var container = e.container;
+
+            var footer = container.find(".k-edit-buttons");
+            footer.hide();
+
+            var un_neccerayrfields = $(".k-edit-field");
+            var un_neccerayrlabels = $(".k-edit-label");
+            un_neccerayrfields.map(function (field) {
+              if (new Array(3, 4, 5, 6, 7, 8).indexOf(field) != -1) {
+                un_neccerayrfields[field].remove();
+                un_neccerayrlabels[field].remove();
+              }
+            });
+            $(".k-input-inner").attr("disabled", "true");
+            $(".k-window-title").html("Task Detail");
+            $('#ownerId_label').html('Maintainance Type');
+           var test= $(".k-select.k-input-button.k-button.k-button-md.k-button-solid.k-button-solid-base.k-icon-button");
+           test.remove();
+          },
+          
+        });
+      });
+
+      function CreateCheckField() {
+        var CheckboxHtm = "";
+        let FilterArray = [];
+        for (i = 0; i <= tasks.length - 1; i++) {
+          if (FilterArray.includes(tasks[i].ownerId) == false) {
+            for (x = 0; x <= groupColors.length - 1; x++) {
+              if (groupColors[x].value == tasks[i].ownerId) {
+                CheckboxHtm += `<input checked type="checkbox" class="larger"  id="${tasks[i].ownerId}" onclick="CheckChange()" aria-label="${tasks[i].ownerId}" value="${tasks[i].ownerId}" style="accent-color:${groupColors[x].color};"><label for="${tasks[i].ownerId}" class="checkDesign"> ${tasks[i].ownerName}</label>`;
+                FilterArray.push(tasks[i].ownerId);
+              }
+            }
+          }
+        }
+        $("#people").append(CheckboxHtm);
+      }
+
+      function CheckChange() {
+        var checked = $.map($("#people :checked"), function (checkbox) {
+          return parseInt($(checkbox).val());
+        });
+        var scheduler = $("#scheduler").data("kendoScheduler");
+        scheduler.dataSource.filter({
+          operator: function (tasks) {
+            return $.inArray(tasks.ownerId, checked) >= 0;
+          },
+        });
+      }
+    </script>
+  </body>
+</html>

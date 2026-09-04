@@ -1,0 +1,35 @@
+label {
+    font-size: 13px;
+}
+
+input, .form-select {
+    font-size: 12px !important;
+}
+
+table tbody td {
+    font-size: 13px;
+}
+
+.swifttab {
+    color: var(--secondary-color);
+    background-color: transparent !important;
+}
+
+.active {
+    color: var(--secondary-color);
+    background-color: transparent !important;
+}
+
+tbody th {
+    color: black;
+}
+
+.checkboxsize {
+    width: 18px;
+    height: 18px;
+}
+
+#pills-tab {
+    flex-direction: row;
+    justify-content: flex-start;
+}

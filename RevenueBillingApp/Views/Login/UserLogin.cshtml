@@ -1,0 +1,58 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Login | ERP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/image/favicon.png" type="image/x-icon">
+    <link href="~/Public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Public/css/vendors.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Public/css/theme.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Public/vendor/fontawesome/css/all.min.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/layout/style.css" rel="stylesheet" />
+    
+</head>
+
+<body class="login-body">
+    <main class="auth-cover-wrapper">
+        <div class="auth-cover-content-inner">
+            <div class="auth-cover-content-wrapper">
+               
+            </div>
+        </div>
+        <div class="auth-cover-sidebar-inner">
+            <div class="auth-cover-card-wrapper">
+                <div class="auth-cover-card p-sm-5">
+                    <div class="mb-5">
+                        <img src="~/Public/image/logo.png" alt="Logo" class="img-fluid">
+                    </div>
+                    <h2 class="fs-20 fw-bolder mb-4">Please login to your account</h2>
+                    <strong style="color:red">@ViewBag.ErrorMessage</strong>
+                    <form method="post" class="w-100 mt-4 pt-2">
+                        <div class="mb-4">
+                            <input type="text" id="LoginName" name="LoginName" class="form-control" placeholder="Enter Login Name" maxlength="20" />
+                        </div>
+                        <div class="mb-3">
+                            <input type="password" id="Password" name="Password" class="form-control" placeholder="Enter Password" maxlength="20" />
+                        </div>
+                        <div class="mt-5">
+                            <button type="submit" asp-controller="Login" asp-action="UserLogin" class="btn btn-primary btn-block fa-lg btn-orange w-100" type="button"><i class="fa-solid fa-right-to-bracket pe-2"></i>Log in</button>
+                            @*<button type="submit" asp-controller="Login" asp-action="AdLogin" class="btn btn-primary btn-block fa-lg btn-orange w-100 mt-3"><i class="fa-solid fa-right-to-bracket pe-2"></i>Login with AD</button>*@
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="~/Public/vendor/jquery/jquery-3.7.1.min.js"></script>
+    <script src="~/Public/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Public/vendor/jquery/jquery.validate.min.js"></script>
+    <script src="~/Public/js/vendors.min.js"></script>
+    <script src="~/Public/js/common-init.min.js"></script>
+</body>
+</html>

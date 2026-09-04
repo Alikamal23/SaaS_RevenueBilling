@@ -1,0 +1,222 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Customer Master";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss {
+    <link href="~/Public/css/custom-css/MasterSetup/Customer.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h5 class="card-title">Party Master (Customer)</h5>
+
+                <div class="row d-none">
+                    <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+                        <input type="text" class="form-control" id="CategoryCode" name="CategoryCode" autocomplete="off" value="1">
+                        <input type="text" class="form-control" id="GLCode" name="GLCode" autocomplete="off" value="010101001">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <form id="masterform" name="masterform" method="post" action="" autocomplete="off">
+                    <div class="row">
+                        <div class="d-none col-12 col-sm-12 col-md-12 col-lg-3">
+                            <input type="text" class="form-control" id="EditID" name="EditID" value="">
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Party Name <span class="required-star">*</span></label>
+                            <input type="text" class="form-control" id="PartyName" name="PartyName" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Contact</label>
+                            <input type="text" class="form-control" id="Contact" name="Contact" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Address</label>
+                            <input type="text" class="form-control" id="Address" name="Address" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Phone 1</label>
+                            <input type="text" class="form-control" id="Phone1" name="Phone1" autocomplete="off" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Phone 2</label>
+                            <input type="text" class="form-control" id="Phone2" name="Phone2" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Cell</label>
+                            <input type="text" class="form-control" id="Cell" name="Cell" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Fax</label>
+                            <input type="text" class="form-control" id="Fax" name="Fax" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Email</label>
+                            <input type="text" class="form-control" id="Email" name="Email" autocomplete="off" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>City</label>
+                            <input type="text" class="form-control" id="City" name="City" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Party Group</label>
+                            <input type="text" class="form-control" id="PartyGroup" name="PartyGroup" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>NTN No</label>
+                            <input type="text" class="form-control" id="NTNNo" name="NTNNo" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>GST No</label>
+                            <input type="text" class="form-control" id="GSTNo" name="GSTNo" autocomplete="off" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                            <label>Remarks</label>
+                            <input type="text" class="form-control" id="Remarks" name="Remarks" autocomplete="off" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2">
+                            <label>Commission</label>
+                            <input type="text" class="form-control" id="Commission" name="Commission" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2">
+                            <label>Van Sharing</label>
+                            <input type="text" class="form-control" id="VanSharing" name="VanSharing" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2">
+                            <label>GST</label>
+                            <input type="text" class="form-control" id="GST" name="GST" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2">
+                            <label>SST</label>
+                            <input type="text" class="form-control" id="SST" name="SST" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2">
+                            <label>WHT</label>
+                            <input type="text" class="form-control" id="WHT" name="WHT" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-2 mt-3 mt-lg-auto">
+                            <input type="checkbox" id="IsActive" name="IsActive" checked>
+                            <label>Active</label>
+                        </div>
+                    </div>
+
+                    <div class="row d-none">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Opening Balance</label>
+                            <input type="text" class="form-control" id="OpeningBalance" name="OpeningBalance" autocomplete="off" value="0" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Opening Date</label>
+                            <input type="date" class="form-control" id="OpeningDate" name="OpeningDate" autocomplete="off" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                            <label>Payment Term</label>
+                            <input type="text" class="form-control" id="PaymentTerm" name="PaymentTerm" autocomplete="off" value="Cash" disabled>
+@*                             <select class="form-select" name="cityID" id="cityID" required>
+                                <option value="">Select City</option>
+                            </select> *@
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-12 d-flex justify-content-end">
+                            @if (_allowinsert)
+                            {
+                                <button class="btn btn-primary btn-sm savebutton" id="SaveBtn" type="button"><i class='feather-save me-2'></i>Save</button>
+                            }
+                            @if (_allowupdate)
+                            {
+                                <button class="btn btn-primary btn-sm d-none updatebutton" id="UpdateBtn" type="button"><i class='feather-save me-2'></i>Update</button>
+                            }
+                            <button class="btn btn-danger btn-sm ms-2 clearbutton" id="ClearBtn" type="button"><i class='feather-x me-2'></i>Clear</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div id="UserMasterDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <table class="table table-hover" id="user-master">
+                            <thead>
+                                <tr>
+                                    <th>Party Name</th>
+                                    <th>Contact</th>
+                                    <th>Address</th>
+                                    <th>Phone1</th>
+                                    <th>Phone2</th>
+                                    <th>Cell</th>
+                                    <th>City</th>
+                                    <th>Party Group</th>
+                                    <th>NTN No</th>
+                                    <th>GST No</th>
+                                    <th>Op. Balance</th>
+                                    <th>Op. Date</th>
+                                    <th>Party Type</th>
+                                    <th>Is Active</th>
+                                    @if (_allowupdate)
+                                    {
+                                        <th>Edit</th>
+                                    }
+                                    @if (_allowdelete)
+                                    {
+                                        <th>Delete</th>
+                                    }
+
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/MasterSetup/Customer.js"></script>
+}
+

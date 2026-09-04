@@ -1,0 +1,256 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Contract Form";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link rel="stylesheet" type="text/css" href="~/Public/css/custom-css/Workflow/HistoryCards.css" />
+
+    <link rel="stylesheet" type="text/css" href="~/Public/css/vendors.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/style.css" />
+}
+
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<div class="page-header mb-2 d-flex align-items-center justify-content-between">
+    <div class="page-header-left">
+        <div class="page-header-title">
+            <h4 class="m-b-10">Client Onboarding Overview</h4>
+        </div>
+        <p class="mb-0">Contract Form Information</p>
+    </div>
+    <div class="page-header-right ms-auto">
+        <div class="page-header-right-items">
+            <div class="d-flex">
+                <a href="/Trans/ViewContractForm" class="btn btn-indigo btn-sm"><i class="feather-list pe-2"></i>Listing</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header p-0">
+            </div>
+            <div class="card-body">
+                <div id="workflowDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <input type="hidden" id="defaultform" value="@defaultform" />
+
+                        <form id="intiateform" name="intiateform" method="post" action="">
+                            <input type="hidden" value="@wfCode" id="workflow" name="workflow" />
+
+                            <input type="hidden" id="hdnContractId" value="@ViewBag.ContractId" />
+                            <input type="hidden" id="hdnAction" value="Add" />
+                            <div class="row" id="appendForm">
+                                <div class="nxl-content">
+                                    <div class="main-content">
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="card border-top-0">
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Client Info</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Client <strong style="color:orangered">*</strong></label>
+                                                                <select class="form-select" id="ddlClient" name="ddlClient">
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Contract Basics</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-4">
+                                                                <label class="form-label">Contract Type <strong style="color:orangered">*</strong></label>
+                                                                <select class="form-select" id="ddlbasicContractType" name="basic_contract_type">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-3">
+                                                                <label class="form-label">Contract Value <strong style="color:orangered">*</strong></label>
+                                                                <input class="form-control" type="number" id="contract_value" name="contract_value">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-3">
+                                                                <label class="form-label">Currency <strong style="color:orangered">*</strong></label>
+                                                                <select class="form-select" id="ddlCurrency" name="ddlCurrency">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-3">
+                                                                <label class="form-label">Discount % (if any)</label>
+                                                                <input class="form-control" type="number" id="discount" name="discount_percent">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-3">
+                                                                <label class="form-label">Tax % (if any)</label>
+                                                                <input class="form-control" type="number" id="tax" name="tax_percent">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">SaaS Specific</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-4">
+                                                                <label class="form-label">Billing Frequency</label>
+                                                                <select class="form-select" id="ddlBillingFreq" name="bill_freq_id">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-4">
+                                                                <label class="form-label">Billing Start Date</label>
+                                                                <input class="form-control" type="date" id="bill_start_date" name="bill_start_date">
+                                                            </div>
+                                                            <div class="col-12 col-md-4">
+                                                                <label class="form-label">Billing End Date</label>
+                                                                <input class="form-control" type="date" id="bill_end_date" name="bill_end_date">
+                                                            </div>
+                                                            <div class="col-12 col-md-6">
+                                                                <label class="form-label">Billing Cycle Day</label>
+                                                                <select class="form-select" id="ddlBillingCycle" name="billing_cycle">
+                                                                    <option value="0" selected>Select Billing Cycle Day</option>
+                                                                    <option value="1">1</option>
+                                                                    <option value="2">2</option>
+                                                                    <option value="3">3</option>
+                                                                    <option value="4">4</option>
+                                                                    <option value="5">5</option>
+                                                                    <option value="6">6</option>
+                                                                    <option value="7">7</option>
+                                                                    <option value="8">8</option>
+                                                                    <option value="9">9</option>
+                                                                    <option value="10">10</option>
+                                                                    <option value="11">11</option>
+                                                                    <option value="12">12</option>
+                                                                    <option value="13">13</option>
+                                                                    <option value="14">14</option>
+                                                                    <option value="15">15</option>
+                                                                    <option value="16">16</option>
+                                                                    <option value="17">17</option>
+                                                                    <option value="18">18</option>
+                                                                    <option value="19">19</option>
+                                                                    <option value="20">20</option>
+                                                                    <option value="21">21</option>
+                                                                    <option value="22">22</option>
+                                                                    <option value="23">23</option>
+                                                                    <option value="24">24</option>
+                                                                    <option value="25">25</option>
+                                                                    <option value="26">26</option>
+                                                                    <option value="27">27</option>
+                                                                    <option value="28">28</option>
+                                                                    <option value="29">29</option>
+                                                                    <option value="30">30</option>
+                                                                    <option value="31">31</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6">
+                                                                <label class="form-label">Renewal Terms (Month)</label>
+                                                                <input class="form-control" type="month" id="renewal_terms_months" name="renewal_terms_months">
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="d-flex align-items-center justify-content-between p-3 rounded-3 custom-switch bd-blue-500">
+                                                                    <div>
+                                                                        <p class="mb-1 fw-bold">Auto Renew</p>
+                                                                        <p class="small mb-0">Automatically extend contract at term end.</p>
+                                                                    </div>
+                                                                    <div class="form-check form-switch p-0 m-0 fs-4">
+                                                                        <input class="form-check-input ms-0" type="checkbox" id="auto_renew" name="auto_renew" role="switch">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-secondary text-white">
+                                                                    <i class="fa-solid fa-circle-info"></i>
+                                                                    <p class="mb-0"><b>Renewal Reminder:</b> Notification will be sent to the contract owner 30 days prior to the expiration date.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                    <div class="card-body">
+                                                        <h5 class="mb-3 fw-bold">Custom Project Specific</h5>
+                                                        <div class="row g-3">
+                                                            <div class="col-12 col-md-6 col-lg-3">
+                                                                <label class="form-label">Project Name</label>
+                                                                <input class="form-control" type="text" id="projectname" name="project_name">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-3">
+                                                                <label class="form-label">Total Project Value</label>
+                                                                <input class="form-control" type="number" id="projectvalue" name="project_value">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-3">
+                                                                <label class="form-label">Number of Milestones</label>
+                                                                <input class="form-control" type="text" id="milestones" name="no_of_milestones">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 col-lg-3">
+                                                                <label class="form-label">Payment Terms</label>
+                                                                <select class="form-select" id="ddlPaymentTerms" name="payment_term_id">
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 mt-3">
+                                                                <label class="form-label">Penalty Terms</label>
+                                                                <input class="form-control" type="text" id="remarks" name="penalty_terms">
+                                                            </div>
+                                                            <div class="col-12 col-md-6 mt-3">
+                                                                <label class="form-label">Support Hours</label>
+                                                                <input class="form-control" type="text" id="supphours" name="support_hours">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <hr class="my-0">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            @if (_allowinsert)
+                            {
+                                <br />
+                                <div class="row ">
+                                    @* <div class="d-flex justify-content-end flex-wrap" id="actionId"></div> *@
+                                    <div class="d-flex justify-content-end flex-wrap" id="actionId">
+                                        <button type="button" class="btn btn-success btn-sm SaveBtn" id="SaveBtn"><i class="feather-save pe-2"></i>Save</button>
+
+                                    </div>
+                                </div>
+                            }
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/vendors.min.js"></script>
+    <script src="~/Public/js/common-init.min.js"></script>
+
+    <script src="~/Public/vendor/leaderline/leaderline.js"></script>
+    <script src="~/Public/js/custom-js/Workflow/WorkflowManager.js"></script>
+    <script src="~/Public/js/custom-js/Trans/ContractForm.js"></script>
+}

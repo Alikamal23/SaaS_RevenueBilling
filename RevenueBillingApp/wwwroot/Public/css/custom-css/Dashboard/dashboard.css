@@ -1,0 +1,186 @@
+#tasks {
+    width: 100% !important;
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+}
+.card-footer {
+    border-bottom-right-radius: 15px !important;
+    border-bottom-left-radius: 15px !important;
+    border-top-right-radius: 0px !important;
+    border-top-left-radius: 0px !important;
+}
+
+.total-workflow {
+    border-bottom-right-radius: 0px !important;
+    border-bottom-left-radius: 0px !important;
+    border-top-right-radius: 15px !important;
+    border-top-left-radius: 15px !important;
+}
+
+.card-chart {
+    border-radius: 15px !important;
+}
+
+
+.tab-content .card-header {
+    background-color: #E1E2E3;
+    padding: 0.5rem;
+}
+
+/*.tab-content {
+        text-align:center;
+    }*/
+
+.tab-pane {
+    width: 97%;
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+    margin: 0px !important;
+}
+
+.wf-name {
+    width: 35%;
+    float: left;
+}
+
+.wf-status {
+    width: 65%;
+    float: left;
+}
+
+.engineering-icon {
+    width: auto !important;
+}
+
+
+button.owl-prev, button.owl-next {
+    font-size: 30px !important;
+}
+
+
+.wf-date {
+    padding-left: 15px;
+}
+
+.wf-time {
+    padding-left: 5px;
+}
+
+
+.tab-content {
+    width: 100% !important;
+}
+
+#tasks {
+    width: 100% !important;
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+}
+
+.dataTables_filter {
+    margin-bottom: 0px
+}
+
+.gridTaskContainer_length > h3 {
+    margin-bottom: 0px !important
+}
+
+#gridTaskContainer {
+    margin-bottom: 0px
+}
+
+
+.bg-color-0 {
+    border-color: #dae0f7 !important;
+    background-color: #ebeefa !important;
+    color: #3454d1 !important;
+}
+
+.bg-color-1 {
+    border-color: #fbdfdf !important;
+    background-color: #fdeded !important;
+    color: #ea4d4d !important;
+}
+
+.bg-color-2 {
+    border-color: #ffddac !important;
+    background-color: #ffebd0 !important;
+    color: #ffa21d !important;
+}
+
+.bg-color-3 {
+    border-color: #fbdfdf !important;
+    background-color: #fdeded !important;
+    color: #ea4d4d !important;
+}
+
+.bg-color-4 {
+    border-color: #b3f6d1 !important;
+    background-color: #e1fbed !important;
+    color: #17c666 !important
+}
+
+.custom-btn:hover {
+    cursor: pointer;
+}
+
+.tasks-carousel .row {
+    width: 20%;
+    float: left;
+    margin: 0;
+}
+
+.nxl-container .nxl-content .main-content {
+    overflow-x: hidden;
+    padding: 10px 15px 5px;
+}
+
+.daily-tasks-card, .tasks-carousel .card {
+    margin-bottom: 0px;
+}
+
+.nxl-container {
+    top: 60px;
+}
+
+.daily-task-row {
+    margin-top: 8px;
+}
+
+.daily-task-table {
+    margin-top: 8px;
+}
+
+
+.dataTables_length label, .dataTables_filter label {
+    font-size: 12px;
+}
+
+.dataTables_wrapper .row:first-child, .dataTables_wrapper .row:last-child {
+    padding: 5px 25px !important;
+    align-items: center;
+}
+
+.daily-task-table select {
+    height: 15px;
+    top: 10px;
+    position: relative;
+    margin: 0 3px;
+}
+
+.custom-card .card-header {
+    padding: 18px 25px;
+}
+
+.daily-task-table .form-control {
+    height: 15px;
+    min-height: 15px;
+}
+
+.table-responsive div.dataTables_wrapper div.dataTables_filter input, .table-responsive div.dataTables_wrapper div.dataTables_filter select,
+.table-responsive div.dataTables_wrapper div.dataTables_length input, .table-responsive div.dataTables_wrapper div.dataTables_length select {
+    padding: 5px 15px
+}
+.page-header {
+    border-radius: 10px;
+}

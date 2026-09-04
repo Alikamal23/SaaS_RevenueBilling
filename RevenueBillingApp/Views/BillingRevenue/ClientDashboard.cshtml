@@ -1,0 +1,590 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Client Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link href="~/public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/public/css/vendors.min.css" rel="stylesheet" />
+    <link href="~/public/vendor/jquery-steps/jquery.steps.min.css" rel="stylesheet" />
+    <link href="~/public/css/theme.min.css" rel="stylesheet" />
+    <link href="~/public/css/custom-css/BillingRevenue/ClientDashboard.css" rel="stylesheet" />
+
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<main class="main-content">
+    <!-- Auto API if error or success give sweet alert message -->
+    <div id="autoInvoiceMessage"
+         data-success="@TempData["AutoInvoiceSuccess"]"
+         data-error="@TempData["AutoInvoiceError"]">
+    </div>
+
+    <div class="page-header">
+        <div class="page-header-left">
+            <div class="page-header-title">
+                <div class="d-flex align-items-center gap-2">
+                    <h4 class="m-b-10 mb-0" id="selectedClientName">
+                        Global Logistics Corporation
+                    </h4>
+
+                    <a href="#"
+                       id="changeClient"
+                       class="change-client-link d-none">
+                        Change
+                    </a>
+                </div>
+
+            </div>
+            <p class="mb-0 d-none">Client ID: AG-99203</p>
+
+            <div class="d-flex align-items-center gap-2 mt-2" id="clientSelectArea">
+
+                <div id="clientSelectWrapper" style="width:320px; flex:0 0 320px;">
+                    <select class="form-select"
+                            id="ddlClient"
+                            name="ddlClient">
+                    </select>
+                </div>
+
+                <button type="button" class="btn btn-primary" id="ShowBtn">
+                    <i class="feather-eye me-2"></i>Show
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="text-center">
+                <div class="spinner-border text-light" style="width:70px;height:70px"></div>
+                <h4 class="text-white mt-3">Loading Client Dashboard...</h4>
+            </div>
+        </div>
+
+
+        <div class="col-md-6 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-uppercase mb-2">Total AR</p>
+                    <h4 data-kpi="total-ar">$1.2M</h4>
+                    <p class="mb-0 text-success">+12.5%</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-uppercase mb-2">Active Contracts</p>
+                    <h4 data-kpi="active-contracts">2</h4>
+                    <p class="mb-0 text-primary">1 SAAS, 1 Implementation</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-uppercase mb-2">Pending Milestones</p>
+                    <h4 data-kpi="pending-milestones">3</h4>
+                    <p class="mb-0 text-warning">Next due in 4 days</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card">
+                <div class="card-body">
+                    <p class="text-uppercase mb-2 text-danger">Current Balance</p>
+                    <h4 class="text-danger" data-kpi="current-balance">$45,200</h4>
+                    <p class="mb-0 text-danger">Overdue</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-top-0">
+                <div class="card-header p-0">
+                    <ul class="nav nav-tabs flex-wrap w-100 text-center customers-nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item flex-fill border-top" role="presentation">
+                            <a href="javascript:void(0);" class="nav-link active" data-bs-toggle="tab" data-bs-target="#overviewTab" role="tab">Overview</a>
+                        </li>
+                        <li class="nav-item flex-fill border-top" role="presentation">
+                            <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#contractTab" role="tab">Contracts</a>
+                        </li>
+                        <li class="nav-item flex-fill border-top" role="presentation">
+                            <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#billingTab" role="tab">Billing & Invoice</a>
+                        </li>
+                        <li class="nav-item flex-fill border-top" role="presentation">
+                            <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#milestoneTab" role="tab">Milestone</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tab-content" id="client-dashboard">
+                    <div class="tab-pane fade show active" id="overviewTab" role="tabpanel">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
+                                            <h5 class="mb-0 fw-semibold">Client Details</h5>
+
+                                            <a href="javascript:void(0);" class="text-primary text-decoration-none small fw-semibold" id="btnClientDetails">
+                                                See More <i class="feather-arrow-right ms-1"></i>
+                                            </a>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <h6 class="text-uppercase">Primary Contact Name</h6>
+                                            <p id="primary_contact_name">-</p>
+
+                                            <h6 class="text-uppercase">NTN No</h6>
+                                            <p id="tax_registration_no">-</p>
+
+                                            <h6 class="text-uppercase">Support Owner</h6>
+                                            <p id="support_owner">-</p>
+
+                                            <h6 class="text-uppercase">Address</h6>
+                                            <p id="billing_address" class="mb-0">-</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-header">
+                                            <h5 class="mb-0 fw-semibold">Payment Behaviour</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="d-flex gap-3 mb-4">
+                                                <h6 class="days border border-primary border-2">42</h6>
+                                                <div>
+                                                    <h6>Avg. Days to Pay</h6>
+                                                    <p class="mb-0">Industry Average: 30 Days</p>
+                                                </div>
+                                            </div>
+                                            <div class="border border-2 bg-soft-danger border-soft-danger rounded-3 p-3">
+                                                <div class="d-flex gap-3 align-items-center">
+                                                    <i class="fa-solid fa-exclamation text-danger fa-2x"></i>
+                                                    <div>
+                                                        <h6 class="text-danger">Previous Escalation</h6>
+                                                        <h6>2 Active Escalation</h6>
+                                                        <p class="mb-0">Regarding overdue invoices INV-4491 & INV-4495</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-header">
+                                            <h5 class="mb-0 fw-semibold">Active Contracts</h5>
+                                        </div>
+                                        <div class="card-body" id="activeContractsList">
+                                            <!-- JS se fill hoga -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-header">
+                                            <h5 class="mb-0 fw-semibold">Milestone Progress</h5>
+                                            <span class="text-uppercase" id="milestoneContractRef">-</span>
+                                        </div>
+                                        <div class="card-body" id="milestoneProgressList">
+                                            <!-- JS se fill hoga -->
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-12 mt-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0 fw-semibold">Recent Billing Activity</h5>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Invoice ID</th>
+                                                            <th>Date</th>
+                                                            <th>Amount</th>
+                                                            <th>Status</th>
+                                                            <th>View</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="recentBillingBody">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="contractTab" role="tabpanel">
+                        <div class="card-body">
+                            <div class="row">
+@*                                 <div class="col-md-4 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p>Total Active Value</p>
+                                                <div class="box bg-primary">
+                                                    <i class="fa-solid fa-money-bill"></i>
+                                                </div>
+                                            </div>
+                                            <h4>$1,240,500.00</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p>Renewal Pipeline (Q3-Q4)</p>
+                                                <div class="box bg-primary">
+                                                    <i class="fa-solid fa-arrow-rotate-right"></i>
+                                                </div>
+                                            </div>
+                                            <h4>$450,200.00</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p>Pending Signatures</p>
+                                                <div class="box bg-primary">
+                                                    <i class="fa-solid fa-file-contract"></i>
+                                                </div>
+                                            </div>
+                                            <h4>2 Contracts</h4>
+                                        </div>
+                                    </div>
+                                </div> *@
+                                <div class="col-12 mt-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0 fw-semibold">Active & Pending Contracts</h5>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Contract ID</th>
+                                                            <th>Type</th>
+                                                            <th>Status</th>
+                                                            <th>Annual Value</th>
+                                                            <th>Term Dates</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="contractGridBody">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="billingTab" role="tabpanel">
+                        <div class="card-body">
+                            <div class="row">
+@*                                 <div class="col-md-4 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p>Current Balance Due</p>
+                                                <div class="box bg-primary">
+                                                    <i class="fa-solid fa-money-bill"></i>
+                                                </div>
+                                            </div>
+                                            <h4>$42,850.00</h4>
+                                            <div class="d-flex gap-3">
+                                                <span class="badge bg-soft-danger text-danger">Overdue</span>
+                                                <span>Next cycle: Oct 15</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p>Average Days to Pay</p>
+                                                <div class="box bg-primary">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                </div>
+                                            </div>
+                                            <h4>12.4 Days</h4>
+                                            <div class="d-flex gap-3">
+                                                <span class="badge bg-soft-primary text-primary">Good</span>
+                                                <span>Top 15% of Clients</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p>Billing Profile</p>
+                                                <div class="box bg-primary">
+                                                    <i class="fa-regular fa-credit-card"></i>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <p class="mb-0">Payment Method:</p>
+                                                <p class="mb-0">Bank Transfer</p>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <p class="mb-0">Net Terms:</p>
+                                                <p class="mb-0">Net-30</p>
+                                            </div>
+                                            <div class="d-flex justify-content-between">
+                                                <p class="mb-0">Currency:</p>
+                                                <p class="mb-0">USD ($)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div> *@
+                                <div class="col-12 mt-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0 fw-semibold">Invoice History</h5>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Invoice ID</th>
+                                                            <th>Date</th>
+                                                            <th>Due Date</th>
+                                                            <th>Amount</th>
+                                                            <th>Status</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="invoiceHistoryBody">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="milestoneTab" role="tabpanel">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p>Active Milestones</p>
+                                                <i class="fa-regular fa-flag"></i>
+                                            </div>
+                                            <h4>12</h4>
+                                            <span>+2 from last month</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p>On Time Completion</p>
+                                                <i class="fa-solid fa-stopwatch"></i>
+                                            </div>
+                                            <h4>94.8%</h4>
+                                            <span class="text-success">Above Benchmark</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p>Projects in Flight </p>
+                                                <i class="fa-solid fa-rocket"></i>
+                                            </div>
+                                            <h4>3</h4>
+                                            <span>Next Delivery: Oct 24</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-3 mb-3 mb-lg-0">
+                                    <div class="card mb-0 h-100">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <p>Blocked Items</p>
+                                                <i class="fa-solid fa-circle-info text-danger"></i>
+                                            </div>
+                                            <h4 class="text-danger">1</h4>
+                                            <span>Requires Client Input</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="mb-0 fw-semibold">Project Tracking</h5>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Milestone Name</th>
+                                                            <th>Deliverables</th>
+                                                            <th>Due Date</th>
+                                                            <th>Status</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="milestoneGridBody">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="ClientDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="feather-user me-2"></i>
+                    Client Details
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Client Name</label>
+                        <input type="text" id="txtClientName"
+                               class="form-control"
+                               readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Industry</label>
+                        <input type="text" id="txtIndustry"
+                               class="form-control"
+                               readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Tax Registration No</label>
+                        <input type="text" id="txtTaxNo"
+                               class="form-control"
+                               readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Country</label>
+                        <input type="text" id="txtCountry"
+                               class="form-control"
+                               readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Primary Contact</label>
+                        <input type="text" id="txtPrimaryContact"
+                               class="form-control"
+                               readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="text" id="txtEmail"
+                               class="form-control"
+                               readonly>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Phone</label>
+                        <input type="text" id="txtPhone"
+                               class="form-control"
+                               readonly>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">Billing Address</label>
+                        <textarea id="txtAddress"
+                                  class="form-control"
+                                  rows="3"
+                                  readonly></textarea>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Close
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section BottomJS {
+    <script src="~/public/vendor/jquery-steps/jquery.steps.min.js"></script>
+    <script src="~/public/js/custom-js/BillingRevenue/ClientDashboard.js"></script>
+}

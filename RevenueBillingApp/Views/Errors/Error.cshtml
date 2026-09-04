@@ -1,0 +1,8 @@
+﻿@model RevenueBillingApp.Models.Authentication.ErrorViewModel;
+@{
+    ViewBag.Title = @Model.StatusCode;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h1>Error Occured!</h1>
+<p>Error Code: @Model.StatusCode</p>
+<p>Please, contact the support by emailing them this page error.</p>

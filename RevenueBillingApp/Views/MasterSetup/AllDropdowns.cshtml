@@ -1,0 +1,270 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "All Dropdowns Master Setup";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link rel="stylesheet" type="text/css" href="~/Public/css/custom-css/Workflow/HistoryCards.css" />
+
+    <link rel="stylesheet" type="text/css" href="~/Public/css/vendors.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/style.css" />
+}
+
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<div class="page-header mb-2">
+    <div class="page-header-left">
+        <div class="page-header-title">
+            <h4 class="m-b-10">All Dropdowns Master Setup</h4>
+        </div>
+        <p class="mb-0">Add New Master Record Entries.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header p-0">
+            </div>
+            <div class="card-body">
+                <div id="workflowDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <input type="hidden" id="defaultform" value="@defaultform" />
+
+                        <form id="masterform" name="masterform" method="post" action="">
+                                <div class="nxl-content">
+                                    <div class="main-content">
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="card border-top-0">
+                                                    <div class="card-header p-0">
+                                                    <ul class="nav nav-tabs flex-wrap w-100 text-center customers-nav-tabs" id="myTab" role="tablist">
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link active master-tab"
+                                                               data-title="Industry"
+                                                               data-master="Industry"
+                                                               data-bs-toggle="tab"
+                                                               href="#industryTab">
+                                                                Industry
+                                                            </a>
+                                                        </li>
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link master-tab"
+                                                               data-title="Company Size"
+                                                               data-master="CompanySize"
+                                                               data-bs-toggle="tab"
+                                                               href="#companySizeTab">
+                                                                Company Size
+                                                            </a>
+                                                        </li>
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link master-tab"
+                                                               data-title="Country"
+                                                               data-master="Country"
+                                                               data-bs-toggle="tab"
+                                                               href="#countryTab">
+                                                                Country
+                                                            </a>
+                                                        </li>
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link master-tab"
+                                                               data-title="Contract Type"
+                                                               data-master="ContractType"
+                                                               data-bs-toggle="tab"
+                                                               href="#contractTypeTab">
+                                                                Contract Type
+                                                            </a>
+                                                        </li>
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link master-tab"
+                                                               data-title="Account Owner"
+                                                               data-master="AccountOwner"
+                                                               data-bs-toggle="tab"
+                                                               href="#accountOwnerTab">
+                                                                Account Owner
+                                                            </a>
+                                                        </li>
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link master-tab"
+                                                               data-title="Support Owner"
+                                                               data-master="SupportOwner"
+                                                               data-bs-toggle="tab"
+                                                               href="#supportOwnerTab">
+                                                                Support Owner
+                                                            </a>
+                                                        </li>
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link master-tab"
+                                                               data-title="Contract Type Basic"
+                                                               data-master="ContractTypeBasic"
+                                                               data-bs-toggle="tab"
+                                                               href="#contractTypeBasicTab">
+                                                                Contract Type Basic
+                                                            </a>
+                                                        </li>
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link master-tab"
+                                                               data-title="Billing Frequency"
+                                                               data-master="BillingFrequency"
+                                                               data-bs-toggle="tab"
+                                                               href="#billingFrequencyTab">
+                                                                Billing Frequency
+                                                            </a>
+                                                        </li>
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link master-tab"
+                                                               data-title="Payment Terms"
+                                                               data-master="PaymentTerms"
+                                                               data-bs-toggle="tab"
+                                                               href="#paymentTermsTab">
+                                                                Payment Terms
+                                                            </a>
+                                                        </li>
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link master-tab"
+                                                               data-title="Billing Type"
+                                                               data-master="BillingType"
+                                                               data-bs-toggle="tab"
+                                                               href="#billingTypeTab">
+                                                                Billing Type
+                                                            </a>
+                                                        </li>
+
+                                                        <li class="nav-item flex-fill border-top">
+                                                            <a class="nav-link master-tab"
+                                                               data-title="Billing Status"
+                                                               data-master="BillingStatus"
+                                                               data-bs-toggle="tab"
+                                                               href="#billingStatusTab">
+                                                                Billing Status
+                                                            </a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+
+                                                    <div class="tab-content">
+
+                                                    <div class="tab-pane fade show active" id="industryTab">
+
+                                                        <div class="card-body">
+
+                                                            <div class="d-flex justify-content-between mb-3">
+                                                                <h5 id="MasterTitle">Industry Master Setup</h5>
+@*                                                                 @if (_allowinsert)
+                                                                {
+                                                                    <button type="button" class="btn btn-primary btnAddNew">
+                                                                        Add New
+                                                                    </button>
+                                                                } *@
+                                                            </div>
+
+                                                            <div class="row mt-3">
+                                                                <div class="col-12">
+                                                                    <div class="card">
+                                                                        <div class="card-body p-0">
+                                                                            <div id="UserMasterDiv">
+                                                                                <table class="table table-hover" id="user-master">
+                                                                                    <thead>
+                                                                                        <tr>
+                                                                                            <th>ID</th>
+                                                                                            <th>Name</th>
+@*                                                                                             @if (_allowupdate)
+                                                                                            {
+                                                                                                <th>Edit</th>
+                                                                                            } *@
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody></tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- #Modal-->
+<div class="modal" id="myModal" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="myModalLabel">Add New</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="EditID" value="0" />
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="txtName">Name: <strong style="color:orangered">*</strong></label>
+                        <input class="form-control" id="txtName" autocomplete="off" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-sm btnSave" id="btnSave"><i class="feather-save pe-2"></i>Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section BottomJS {
+    <script src="~/Public/js/vendors.min.js"></script>
+    <script src="~/Public/js/common-init.min.js"></script>
+    <script src="~/Public/js/client-onboarding.js"></script>
+
+    <script src="~/Public/vendor/leaderline/leaderline.js"></script>
+    <script src="~/Public/js/custom-js/Workflow/WorkflowManager.js"></script>
+    <script src="~/Public/js/custom-js/MasterSetup/AllDropdowns.js"></script>
+}

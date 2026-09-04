@@ -1,0 +1,290 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    RevenueBillingApp.Models.Authentication.UserInfo userInfo = sessionItems.userInfo;
+    string authToken = sessionItems.authToken.access_token;
+    List<RevenueBillingApp.Models.Authentication.Form> _Form = sessionItems.forms;
+    string RequestUrl = Context.Request.RouteValues["controller"].ToString() + "/" + Context.Request.RouteValues["action"].ToString();
+    
+    @functions {
+        public void RenderDesktopViewNavs(RevenueBillingApp.Models.Authentication.Form form, string requestUrl)
+        {
+            string url = "#";
+            if (form.FormController != "" && form.FormController != null)
+            {
+                url = "../" + form.FormController + "/" + form.FormAction;
+            }
+            string active_1 = form.Childrens.Any(x => x.FormController + "/" + x.FormAction == requestUrl) ? "active" : "collapsed";
+            string active_2 = form.Childrens.Any(x => x.FormController + "/" + x.FormAction == requestUrl) ? "show" : "";
+
+            //Dont Show Forms That Have Zero Childrens
+            if (form.Childrens.Count() > 0)
+            {
+                
+                //<div>
+                    <a class="nxl-link parent"  role="button" aria-controls="@form.FormDisplayName">
+                        <span class="nxl-micon"><i class="@form.iconclass"></i></span>
+                        <span class="nxl-mtext">@form.FormDisplayName</span><span class="nxl-arrow"><i class='feather-chevron-right'></i></span>
+                    </a>
+                //</div>
+
+                <ul class="nxl-submenu @active_2" id="GROUP_@form.FormID">
+                    @foreach (var child in form.Childrens)
+                    {
+                        string active_3 = (requestUrl == child.FormController + "/" + child.FormAction) ? "active" : "";
+
+                        <li class="nxl-item">
+                            @if (child.Childrens.Any())
+                            {
+                                this.RenderDesktopViewNavs(child, requestUrl);
+                            }
+                            else
+                            {
+                                <a class="nxl-link parent" href="../@child.FormController/@child.FormAction">
+                                    <span class="nxl-micon"><i class="@child.iconclass"></i></span>
+                                    <span class="nxl-mtext">@child.FormDisplayName</span>
+                                </a>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                string active_3 = (requestUrl == form.FormController + "/" + form.FormAction) ? "active" : "";
+
+                <li class="nxl-item">
+                    @if (form.Childrens.Any())
+                    {
+                        this.RenderDesktopViewNavs(form, requestUrl);
+                    }
+                    else
+                    {
+                        <a class="nxl-link parent" href="../@form.FormController/@form.FormAction">
+                            <span class="nxl-micon"><i class="@form.iconclass"></i></span>
+                            <span class="nxl-mtext">@form.FormDisplayName</span>
+                        </a>
+                    }
+                </li>
+            }
+        }
+
+        public void RenderMobileViewNavs(RevenueBillingApp.Models.Authentication.Form form, string requestUrl)
+        {
+            string url = "#";
+            if (form.FormController != "" && form.FormController != null)
+            {
+                url = "../" + form.FormController + "/" + form.FormAction;
+            }
+            string active_1 = form.Childrens.Any(x => x.FormController + "/" + x.FormAction == requestUrl) ? "active" : "collapsed";
+            string active_2 = form.Childrens.Any(x => x.FormController + "/" + x.FormAction == requestUrl) ? "show" : "";
+
+            //Dont Show Forms That Have Zero Childrens
+            if (form.Childrens.Count() > 0)
+            {
+                <div>
+                    <a class="nav-link parentmobile" href="@url">
+                        <i class="bx bxs-cog"></i>
+                        <span class="nav_name">@form.FormDisplayName</span>
+                    </a>
+                    <a class="nav_link dropdown-nav-mobile" data-bs-toggle="collapse"  role="button" aria-expanded="false" aria-controls="@form.FormDisplayName">
+                        <i class='bx bx-chevron-down'></i>
+                    </a>
+                </div>
+
+                <div class="collapse navbar-collapse @active_2" id="GROUP_@form.FormID">
+                    <ul class="navbar-nav">
+                        @foreach (var child in form.Childrens)
+                        {
+                            string active_3 = (requestUrl == child.FormController + "/" + child.FormAction) ? "active" : "";
+
+                            <li class="nav-item">
+                                @if (child.Childrens.Any())
+                                {
+                                    this.RenderMobileViewNavs(child, requestUrl);
+                                }
+                                else
+                                {
+                                    <a class="nav-link @active_3" href="../@child.FormController/@child.FormAction">@child.FormDisplayName</a>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        }
+    }
+
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewBag.Title | Revenue & Business Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="~/Public/image/favicon.png">
+    <link href="~/Public/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Public/vendor/boxicons/css/boxicons.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Public/css/custom-css/Layout/style.css" rel="stylesheet" type="text/css" />
+    @*<link href="~/Public/css/custom-css/Layout/_Layout.css" rel="stylesheet" type="text/css" />
+    <link href="~/Public/css/custom-css/Layout/responsive.css" rel="stylesheet" type="text/css" />*@
+    <link href="~/Public/css/vendors.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Public/css/theme.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Public/vendor/select2/select2.min.css" rel="stylesheet" type="text/css" />
+    @*<link href="~/Public/vendor/datatables/css/datatables.min.css" rel="stylesheet" type="text/css" />*@
+    <link href="~/Public/vendor/datatables/datatables.bs5.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Public/vendor/sweetalert/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Public/vendor/Highcharts-11.0.1/code/css/highcharts.css" />
+    <link href="~/Public/vendor/feather-icon/feather.min.css" rel="stylesheet" />
+    <link href="~/Public/vendor/fontawesome/css/all.min.css" rel="stylesheet" />
+    @RenderSection("TopCss", false)
+</head>
+
+<body id="body-pd">
+    <nav class="nxl-navigation">
+        <div class="navbar-wrapper">
+            <div class="m-header">
+                <a class="logo logo-lg mb-0">
+                    <img src="~/Public/image/logo.png" class="w-75" />
+                </a>
+                <a class="logo logo-sm mb-0">
+                    <img src="~/Public/image/logo.png" class="img-fluid" />
+                </a>
+            </div>
+            <div class="navbar-content">
+                <ul class="nxl-navbar">
+                    @{
+                        @if (_Form.Count > 0)
+                        {
+                            @foreach (var form in _Form)
+                            {
+
+                                if (form.Childrens.Count > 0 || (form.FormController != null && form.FormAction != null))
+                                {
+                                    <li class="nxl-item nxl-hasmenu">
+                                        @{
+                                            this.RenderDesktopViewNavs(form, RequestUrl);
+                                        }
+                                    </li>
+                                }
+                            }
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+
+        
+    </nav>
+
+    <header class="nxl-header">
+        <div class="header-wrapper">
+            <div class="header-left d-flex align-items-center gap-4">
+                <a href="javascript:void(0);" class="nxl-head-mobile-toggler" id="mobile-collapse">
+                    <div class="hamburger hamburger--arrowturn">
+                        <div class="hamburger-box">
+                            <div class="hamburger-inner"></div>
+                        </div>
+                    </div>
+                </a>
+                <div class="nxl-navigation-toggle">
+                    <a href="javascript:void(0);" id="menu-mini-button" class="text-decoration-none">
+                        <i class="feather-align-left"></i>
+                    </a>
+                    <a href="javascript:void(0);" id="menu-expend-button" style="display: none" class="text-decoration-none">
+                        <i class="feather-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="page-header-right ms-auto">
+                <div class="d-flex align-items-center">
+                    <div class="dropdown nxl-h-item">
+                        <a href="javascript:void(0);" data-bs-toggle="dropdown" role="button" data-bs-auto-close="outside">
+                            <img src="~/Public/image/@(userInfo.UserImage == null ? "profile.png" : "UserImage/" + userInfo.UserImage)" alt="profile" class="img-fluid user-avtar me-0">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end nxl-h-dropdown nxl-user-dropdown">
+                            <div class="dropdown-header">
+                                <div class="d-flex align-items-center">
+                                    <img src="~/Public/image/@(userInfo.UserImage == null ? "profile.png" : "UserImage/" + userInfo.UserImage)" alt="profile" class="img-fluid user-avtar">
+                                    <div>
+                                        <h6 class="text-dark mb-0">@userInfo.UserName</h6>
+                                        <span class="fs-12 fw-medium text-muted">@userInfo.RoleName</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <a href="~/Settings/UserProfile" class="dropdown-item">
+                                <i class="feather-user"></i>
+                                <span>My Profile</span>
+                            </a>
+                            <a href="~/Login/ChangePassword" class="dropdown-item">
+                                <i class="feather-lock"></i>
+                                <span>Change Password</span>
+                            </a>
+                            <a href="~/Login/Logout" class="dropdown-item">
+                                <i class="feather-lock"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <main class="nxl-container">
+        <div class="nxl-content">
+            <div class="main-content">
+                @RenderBody()
+            </div>
+        </div>
+    </main>
+
+    <script src="~/Public/vendor/jspdf/jspdf.min.js"></script>
+    <script src="~/Public/vendor/jspdf/jspdf.plugin.autotable.min.js"></script>
+    <script src="~/Public/vendor/html2pdf/html2pdf.bundle.min.js"></script>
+    <script src="~/Public/vendor/html2pdf/html2canvas.js"></script>
+    <script src="~/Public/vendor/jquery/jquery-3.7.1.min.js"></script>
+    <script src="~/Public/js/vendors.min.js"></script>
+    <script src="~/Public/js/common-init.min.js"></script>
+    <script src="~/Public/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/Public/vendor/jquery/jquery.validate.min.js"></script>
+    <script src="~/Public/vendor/datatables/datatables.min.js"></script>
+    <script src="~/Public/vendor/datatables/datatables.bs5.min.js"></script>
+    <script src="~/Public/vendor/datatables/js/dataTables.rowGroup.min.js"></script>
+    <script src="~/Public/vendor/datatables/js/rowGroup.dataTables.js"></script>
+    <script src="~/Public/vendor/datatables/js/datatables.buttons.min.js"></script>
+    <script src="~/Public/vendor/datatables/js/jszip.min.js"></script>
+    <script src="~/Public/vendor/datatables/js/pdfmake.min.js"></script>
+    <script src="~/Public/vendor/datatables/js/vfs_fonts.js"></script>
+    <script src="~/Public/vendor/datatables/js/buttons.html5.min.js"></script>
+    <script src="~/Public/vendor/datatables/js/buttons.print.min.js"></script>
+    <script src="~/Public/vendor/select2/select2.min.js"></script>
+    <script src="~/Public/vendor/SignalR/jquery.signalR-2.4.3.min.js"></script>
+    <script src="~/Public/vendor/sweetalert/sweetalert2.all.min.js"></script>
+    <script src="~/Public/vendor/Highcharts-11.0.1/code/highcharts.js"></script>
+    <script src="~/public/vendor/highcharts-11.0.1/code/modules/heatmap.js"></script>
+    <script src="~/public/vendor/highcharts-11.0.1/code/modules/variable-pie.js"></script>
+    <script src="~/public/js/classes/APICALL.js"></script>
+    <script src="~/public/js/classes/UTILITY.js"></script>
+    <!-- common js functions like FormatDate, FormatAmount, ConvertToWords etc -->
+    <script src="~/Public/js/common-function.js"></script>
+    <script src="~/public/js/classes/JSONTOEXCEL.js"></script>
+
+    <!-- Excel Preview Library -->
+    <script src="~/Public/js/xlsx.full.min.js"></script>
+
+    <!-- DOCX Preview Library -->
+    <script src="~/Public/js/mammoth.browser.min.js"></script>
+
+    <script src="~/public/js/classes/REPORTGENERATOR.js"></script>
+
+    <script src="~/Public/js/custom-js/Layout/_Layout.js"></script>
+    @RenderSection("BottomJS", false)
+</body>
+</html>

@@ -1,0 +1,259 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Outdoor Shop Fascia Form";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss {
+    @* <link href="~/Public/css/custom-css/Settings/UserMaster.css" rel="stylesheet" /> *@
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h5 class="card-title">Category Wise Model Form</h5>
+                @* <button class="btn btn-primary" id="AddBtn" type="button"><i class='feather-user me-2'></i>Key Factors</button> *@
+            </div>
+            <div class="card-body">
+                <form action="#" id="cwmformmodel">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="pill" href="#img">Upload/Update Document</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="pill" href="#cwmform">Create Form</a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div class="tab-pane container fade" id="img">
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card" style="width: 60rem;">
+                                        <div class="card-body">
+
+                                            <div class="row">
+
+                                                <div class="col-md-6 col-lg-4">
+                                                    <label for="question" class="form-label"><span style="color:red">* </span>Category:</label>
+                                                    <select class="form-control Category" id="ddl_category" placeholder="Category" name="ddl_category"></select>
+                                                </div>
+
+                                                <div class="col-md-6 col-lg-4">
+                                                    <label for="uploader" class="form-label"><span style="color:red">* </span>Upload Images:</label>
+                                                    <input class="form-control uploader" accept="application/pdf" type="file" id="uploader" placeholder="uploader" name="uploader">
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-12 text-right mt-3">
+                                                        <button type="button" id="btn_upload" class="btn btn-primary btn-sm btn_upload"><i class='bx bxs-save pr-2'></i>Upload</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="tab-pane container active" id="cwmform">
+
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="row" id="questiondiv">
+                                                <div class="col-md-6 col-lg-4">
+                                                    <label for="question" class="form-label"><span style="color:red">* </span>Category:</label>
+                                                    <select class="form-control Category" id="ddl_category_form" placeholder="Category" name="ddl_category_form"></select>
+                                                </div>
+
+                                                <div class="col-md-6 col-lg-4">
+                                                    <label for="txt_companystandard" class="form-label"><span style="color:red">* </span>Company Standard:</label>
+                                                    <input class="form-control" type="text" id="txt_companystandard" placeholder="Company Standard" name="txt_companystandard">
+
+                                                    <input type="hidden" id="hd_formid" />
+                                                    <input type="hidden" id="hd_modelid" />
+                                                </div>
+
+                                                <div class="col-md-6 col-lg-4">
+                                                    <label for="txt_standard" class="form-label"><span style="color:red">* </span>Standard:</label>
+                                                    <input class="form-control" type="text" id="txt_standard" placeholder="Standard" name="txt_standard">
+                                                </div>
+
+
+                                                <div id="main-container" class="col-md-6 mt-2 answer_types">
+                                                    <label for="answer" class="form-label w-100"><span style="color:red">* </span>Answer Type:</label>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" id="chk_evaluation" asnwertype-name="Evaluation" asnwertype-Id="1" type="checkbox" value="1">
+                                                        <label class="form-check-label" for="rating_check_2">Evaluation</label>
+
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" id="chk_yes" asnwertype-name="Yes/No" asnwertype-Id="2" type="checkbox" value="2">
+                                                        <label class="form-check-label" for="rating_check_2">Yes/No</label>
+                                                    </div>
+
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" id="chk_feed" asnwertype-name="Feedback" asnwertype-Id="3" type="checkbox" value="3">
+                                                        <label class="form-check-label" for="rating_check_2">Feedback</label>
+                                                    </div>
+
+                                                </div>
+
+
+                                            </div>
+
+                                            <div id="correctanswer_yes" class="row">
+
+                                                <div class="yes_no box" id="answerdiv">
+                                                    <label for="remarks" class="form-label w-100">Correct Answer(Yes/No):</label>
+                                                    <div class="form-check form-check-inline mt-auto">
+                                                        <input type="radio" id="c_yes" name="correct_answer_yes" value="1">
+                                                        <label for="c_yes">Yes</label><br>
+                                                        <input type="radio" id="c_no" name="correct_answer_yes" value="0">
+                                                        <label for="c_no">No</label><br>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                            <div id="correctanswer_feedback" class="row">
+                                                <div class="yes_no box" id="feedbackdiv">
+                                                    <label for="remarks" class="form-label w-100">Correct Answer(Good/Bad/Fair):</label>
+                                                    <div class="form-check form-check-inline mt-auto">
+                                                        <input type="radio" id="c_good" name="correct_answer_feed" value="1">
+                                                        <label for="c_good">Good</label><br>
+                                                        <input type="radio" id="c_fair" name="correct_answer_feed" value="2">
+                                                        <label for="c_fair">Fair</label><br>
+                                                        <input type="radio" id="c_bad" name="correct_answer_feed" value="3">
+                                                        <label for="c_bad">Bad</label><br>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-6 mt-4">
+                                                <div class="checkbox_div attachementdiv" id="attachementdiv" style="">
+                                                    <label for="checkbox_input" class="form-label w-100">Attachment :</label>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="image_ck_6" value="1">
+                                                        <label class="form-check-label" for="image_ck_6">Image</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="audio_ck_6" value="2">
+                                                        <label class="form-check-label" for="audio_ck_6">Audio</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="video_ck_6" value="3">
+                                                        <label class="form-check-label" for="video_ck_6">Video</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="checkbox" id="contact_no_ck_6" value="4">
+                                                        <label class="form-check-label" for="contact_no_ck_6">Contact No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-md-6 col-lg-4 mt-4">
+                                                    <div class="form-check form-check-inline mt-auto">
+                                                        <input type="checkbox" class="form-check-input checkbox-check" checkbox="remarks" id="chk_remarks">
+                                                        <label class="form-check-label" for="chk_remarks">Remarks</label>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6 col-lg-4 mt-4">
+                                                    <div class="form-check form-check-inline mt-auto">
+                                                        <input type="checkbox" class="form-check-input checkbox-check" checkbox="status" id="chk_status">
+                                                        <label class="form-check-label" for="chk_status">Is Active</label>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-12 mt-4">
+                                                <label for="guideline" class="form-label">Guideline:</label>
+                                                <input class="form-control" type="text" id="guideline" placeholder="Guideline" name="guideline">
+                                            </div>
+                                            <div class="row mt-3">
+                                                <div class="col-12 d-flex justify-content-end">
+                                                    @if (_allowinsert)
+                                                    {
+                                                        <button class="btn btn-primary btn-sm btn_save" id="btn_save" type="button"><i class='feather-save me-2'></i>Save</button>
+                                                    }
+                                                    @if (_allowupdate)
+                                                    {
+                                                        <button class="btn btn-primary btn-sm d-none  btn_update" id="btn_update" type="button"><i class='feather-save me-2'></i>Update</button>
+                                                    }
+                                                    <button class="btn btn-danger btn-sm ms-2 btn_cancel" id="btn_cancel" type="button"><i class='feather-x me-2'></i>Clear</button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div id="UserMasterDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped" id="tbl_cwmform">
+                                <thead>
+                                    <tr>
+                                        <td>S.R</td>
+                                        <td>Caterogy Type</td>
+                                        <td>Company Standard</td>
+                                        <td> Standard</td>
+                                        <td>Guidline</td>
+                                        <td>Answer Types</td>
+                                        <td>Action</td>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/DMS/CWMForm.js"></script>
+}
+

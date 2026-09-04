@@ -1,0 +1,247 @@
+﻿*,
+*::after,
+*::before {
+    /*box-sizing: inherit;*/
+    margin: 0;
+    padding: 0;
+}
+
+.card-front__heading {
+    /*font-size: 1.5rem;*/
+    font-weight: 600;
+    margin-bottom: unset !important;
+}
+
+.inside-page__heading {
+    font-weight: 600;
+    margin-bottom: unset !important;
+    width: 100%;
+}
+
+.card-front__tp {
+    color: #fafbfa;
+}
+
+.card-front__text-price {
+    /*font-size: 1.2rem;*/
+    margin-top: 0.25rem
+}
+
+.card-front__icon {
+    fill: #fafbfa;
+    font-size: 3vw;
+    height: 3.25rem;
+    margin-top: -0.5rem;
+    width: 3.25rem;
+}
+
+.flow-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+}
+
+.history-card {
+    /*height: 10rem;*/
+    width: 10rem;
+    position: relative;
+    transition: all 1s ease;
+    margin: 30px;
+}
+
+.done {
+    border: 1px solid  #0b3e21;
+}
+
+.done h3 {
+    color: #00a650 !important;
+}
+.closed {
+    border: 1px solid #ed2929;
+}
+
+.closed h3 {
+    color: #ed2929 !important;
+}
+.pending h3 {
+    color: #7c7c7c !important;
+}
+
+.Comment {
+    border: 1px solid #90EE90;
+}
+
+.Comment h3 {
+    color: #92bd92 #90EE90;
+}
+.execute {
+    border: 1px solid #4de796;
+}
+.pending_execute {
+    border: 1px solid #4B4E53;
+}
+    .pending_execute h3 {
+        color: #4B4E53 #4B4E53;
+    }
+.execute h3 {
+    color: #4de796 #4de796;
+}
+
+.pending {
+    border: 1px solid #7c7c7c;
+    box-shadow: 0 0 15px #ffffff inset;
+}
+.in_progress {
+    border: 1px solid #e4a93c;
+    box-shadow: 0 0 15px #ffffff inset;
+}
+
+.card-front {
+    background-color: #fafbfa;
+    height: 15rem;
+    width: 15rem;
+}
+
+.card-front__tp {
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 57% 90%, 50% 100%, 43% 90%, 0 90%);
+    height: 80%;
+    padding: 0.5rem;
+    overflow-y: auto;
+}
+
+.card-front_in_progress {
+    background: linear-gradient(to bottom, #e4a93c, #e4a93c);
+}
+
+.card-front_pending {
+    background: linear-gradient(to bottom, #ababab, #7c7c7c)
+}
+
+.card-front_done {
+    background: linear-gradient(to bottom, #4d7d62, #0b3e21);
+}
+.card-front_Comment {
+    background: linear-gradient(to bottom, #92bd92 100%, #90EE90 100%);
+}
+.card-front_execute {
+    background: linear-gradient(to bottom, #4de796 100%, #4de796 100%);
+}
+
+.card-front_pending_execute {
+    background: linear-gradient(to bottom, #4B4E53 100%, #4B4E53 100%);
+}
+.card-front_closed {
+    background: linear-gradient(to bottom, #ed2929, #ed2929)
+}
+
+.card-front__bt {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.card-back {
+    background-color: #fafbfa;
+    transform: rotateY(180deg);
+    padding: 10px;
+}
+
+.flip-card {
+    background-color: #ffffff00;
+    perspective: 1000px;
+}
+
+.flip-card > * {
+    cursor: context-menu;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -moz-backface-visibility: hidden;
+}
+
+/*.flip-card.hover .flip-card-inner {
+    transform: rotateY(180deg);
+}*/
+
+.flip-card.hover .flip-card-front {
+    transform: rotateY(180deg);
+    
+}
+
+.flip-card.hover .flip-card-back {
+    transform: rotateY(360deg);
+}
+
+.flip-card:focus {
+    outline: 0;
+}
+
+/*.flip-card:hover .flip-card-inner,
+.flip-card:focus .flip-card-inner {
+    transform: rotateY(180deg);
+}*/
+
+.flip-card-front,
+.flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.flip-card-front {
+    background-color: #ffffff;
+    z-index: 2;
+}
+
+.flip-card-back {
+    padding: 10px 5px 0px 5px;
+    transform: rotateY(180deg);
+    overflow: auto;
+}
+
+.flip-card-back p {
+    font-size: 11px !important;
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 149px;
+    text-align: center;
+    transition: transform 0.4s;
+    transform-style: preserve-3d;
+}
+
+.inside-page__text {
+    margin-bottom: 0.5rem !important;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background-color: #ebebeb;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: #b9b9b9;
+}

@@ -1,0 +1,89 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Contract Form";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss {
+    <link href="~/Public/css/custom-css/MasterSetup/Customer.css" rel="stylesheet" />
+}
+
+@{
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+
+<div class="page-header mb-2 d-flex align-items-center justify-content-between">
+    <div class="page-header-left">
+        <div class="page-header-title">
+            <h4 class="m-b-10">Recurring Billing Form</h4>
+        </div>
+    </div>
+    <div class="page-header-right ms-auto">
+        <div class="page-header-right-items">
+            <div class="d-flex">
+                <a href="/Trans/RecurringBilling" class="btn btn-indigo btn-sm"><i class="feather-plus-circle pe-2"></i>Add New</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div id="UserMasterDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="user-master">
+                                <thead>
+                                    <tr>
+                                        @* <th>ID</th> *@
+                                        <th>Client Name</th>
+                                        <th>Contract Name</th>
+                                        <th>Bill Start Date</th>
+                                        <th>Bill End Date</th>
+                                        <th>Amount</th>
+                                        <th>Tax Percent</th>
+                                        <th>Total Amount</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+
+                                        @if (_allowupdate)
+                                        {
+                                            <th>Edit</th>
+                                        }
+                                        @if (_allowdelete)
+                                        {
+                                            <th>Delete</th>
+                                        }
+
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/Trans/ViewRecurringBilling.js"></script>
+}
+

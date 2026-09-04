@@ -1,0 +1,1082 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Client on Boarding";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss
+{
+    <link rel="stylesheet" type="text/css" href="~/Public/css/custom-css/Workflow/HistoryCards.css" />
+
+    <link rel="stylesheet" type="text/css" href="~/Public/css/vendors.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/theme.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/Public/css/style.css" />
+}
+
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+    string wfCode = ViewBag.wfCode;
+    string defaultform = sessionItems.userInfo.DefaultFormName;
+}
+
+<div class="page-header mb-2 d-flex align-items-center justify-content-between">
+
+    <!-- LEFT -->
+    <div class="page-header-left">
+        <div class="page-header-title">
+            <h4 class="m-b-10">Client Onboarding Overview</h4>
+        </div>
+        <p class="mb-0">Create the client record + define contract basics</p>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="page-header-right ms-auto text-end">
+        <h5 id="activeTabTitle" class="mb-0 fw-bold text-primary"></h5>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header p-0">
+            </div>
+            <div class="card-body">
+                <div id="workflowDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <input type="hidden" id="defaultform" value="@defaultform" />
+
+                        <form id="intiateform" name="intiateform" method="post" action="">
+                            <input type="hidden" value="@wfCode" id="workflow" name="workflow" />
+                            <div class="row" id="appendForm">
+                                <div class="nxl-content">
+                                    <div class="main-content">
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <div class="card border-top-0">
+                                                    <div class="card-header p-0">
+                                                        <ul class="nav nav-tabs flex-wrap w-100 text-center customers-nav-tabs" id="myTab" role="tablist">
+                                                            <li class="nav-item flex-fill border-top" role="presentation">
+                                                                <a href="javascript:void(0);" class="nav-link active" data-bs-toggle="tab" data-bs-target="#onboardingTab" role="tab">Client Onboarding</a>
+                                                            </li>
+                                                            <li class="nav-item flex-fill border-top" role="presentation">
+                                                                <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#contractTab" role="tab">Contract</a>
+                                                            </li>
+                                                            <li class="nav-item flex-fill border-top" role="presentation">
+                                                                <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#billingTab" role="tab">Billing</a>
+                                                            </li>
+                                                            <li class="nav-item flex-fill border-top" role="presentation">
+                                                                <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#recurringTab" role="tab">Recurring Billing</a>
+                                                            </li>
+                                                            <li class="nav-item flex-fill border-top" role="presentation">
+                                                                <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#milestoneTab" role="tab">Milestone</a>
+                                                            </li>
+                                                            <li class="nav-item flex-fill border-top" role="presentation">
+                                                                <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#completionTab" role="tab">Milestone Completion</a>
+                                                            </li>
+                                                            <li class="nav-item flex-fill border-top" role="presentation">
+                                                                <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#invoiceTab" role="tab">Invoice</a>
+                                                            </li>
+                                                            <li class="nav-item flex-fill border-top" role="presentation">
+                                                                <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#paymentTab" role="tab">Payment</a>
+                                                            </li>
+                                                            <li class="nav-item flex-fill border-top" role="presentation">
+                                                                <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#arTab" role="tab">AR Exception</a>
+                                                            </li>
+                                                            <li class="nav-item flex-fill border-top" role="presentation">
+                                                                <a href="javascript:void(0);" class="nav-link" data-bs-toggle="tab" data-bs-target="#renewalTab" role="tab">Renewal</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+
+                                                    <div class="tab-content">
+                                                        <div class="tab-pane fade show active" id="onboardingTab" role="tabpanel">
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Client Information</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Client Name <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="text" id="client_name" name="client_name">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Industry</label>
+                                                                        <select class="form-select" id="ddlIndustry" name="industry_id">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Company Size</label>
+                                                                        <select class="form-select" id="ddlCompanySize" name="company_size_id">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Website <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="text" id="website" name="website">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Tax Registration No (NTN/VAT/TRN) <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="text" id="tax_registration_no" name="tax_registration_no">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Country</label>
+                                                                        <select class="form-select" id="ddlCountry" name="country_id">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <label class="form-label">Billing Address <strong style="color:orangered">*</strong></label>
+                                                                        <textarea class="form-control" rows="3" id="billing_address" name="billing_address"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="fw-bold mb-3">Primary Contact Details</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Full Name <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="text" id="primary_contact_name" name="primary_contact_name">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Email Address <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="text" id="primary_contact_email" name="primary_contact_email">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Phone Number <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="text" id="primary_contact_phone" name="primary_contact_phone">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Commercial Setup</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Contract Type <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlContractType" name="contract_type_id">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Account Owner (Internal)</label>
+                                                                        <select class="form-select" id="ddlaccOwner" name="account_owner_id">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Support Owner</label>
+                                                                        <select class="form-select" id="ddlsupOwner" name="support_owner_id">
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Timeline &amp; Key Dates</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Onboarding Start Date</label>
+                                                                        <input class="form-control" type="date" id="onboarding_start_date" name="onboarding_start_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Estimated Completion Date</label>
+                                                                        <input class="form-control" type="date" id="onboarding_completion_date" name="onboarding_completion_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Billing Start Date</label>
+                                                                        <input class="form-control" type="date" id="billing_start_date" name="billing_start_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Contract Start Date</label>
+                                                                        <input class="form-control" type="date" id="contract_start_date" name="contract_start_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Contract End/Renewal Date</label>
+                                                                        <input class="form-control" type="date" id="contract_end_date" name="contract_end_date">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body" id="docSection">
+                                                                <h5 class="mb-3 fw-bold">Required Documents</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4 uploader">
+                                                                        <label class="upload-box w-100">
+                                                                            <input type="file" id="doc" name="contract_upload" class="d-none file-input" multiple accept=".pdf, .doc, .docx">
+                                                                            <h5>Upload Signed Contract</h5>
+                                                                            <p class="text-muted mb-0">PDF, DOCX, DOC</p>
+                                                                        </label>
+                                                                        <div class="preview-container row"></div>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4 uploader">
+                                                                        <label class="upload-box w-100">
+                                                                            <input type="file" id="nda" name="nda_upload" class="d-none file-input" multiple accept=".pdf, .doc, .docx">
+                                                                            <h5>Upload NDA</h5>
+                                                                            <p class="text-muted mb-0">PDF, DOCX, DOC</p>
+                                                                        </label>
+                                                                        <div class="preview-container row"></div>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4 uploader">
+                                                                        <label class="upload-box w-100">
+                                                                            <input type="file" id="proposal" name="proposal_upload" class="d-none file-input" multiple accept=".pdf, .doc, .docx">
+                                                                            <h5>Upload Approved Proposal</h5>
+                                                                            <p class="text-muted mb-0">PDF, DOCX, DOC</p>
+                                                                        </label>
+                                                                        <div class="preview-container row"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Internal Administration <strong style="color:orangered">*</strong></h5>
+                                                                <div class="d-flex align-items-center justify-content-between p-3 rounded-3 custom-switch bd-blue-500">
+                                                                    <div>
+                                                                        <p class="mb-1 fw-bold">High-Value Client</p>
+                                                                        <p class="small mb-0">Flag this client for executive reporting and special attention.</p>
+                                                                    </div>
+                                                                    <div class="form-check form-switch p-0 m-0 fs-4">
+                                                                        <input id="highvalue" name="high_value_client" value="true" class="form-check-input ms-0" type="checkbox" role="switch">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="mt-3">
+                                                                    <label class="form-label">Priority Level</label>
+                                                                    <div class="row g-2 priority-btn-group" role="group">
+                                                                        <div class="col">
+                                                                            <input type="radio" class="btn-check" name="priority_level" id="prio-low" value="low">
+                                                                            <label class="btn w-100 bg-light d-block text-center rounded-3" for="prio-low">Low</label>
+                                                                        </div>
+                                                                        <div class="col">
+                                                                            <input type="radio" class="btn-check" name="priority_level" id="prio-med" value="medium">
+                                                                            <label class="btn w-100 bg-light d-block text-center rounded-3" for="prio-med">Medium</label>
+                                                                        </div>
+                                                                        <div class="col">
+                                                                            <input type="radio" class="btn-check" name="priority_level" id="prio-high" value="high">
+                                                                            <label class="btn w-100 bg-light d-block text-center rounded-3" for="prio-high">High</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                        </div>
+                                                        <div class="tab-pane fade" id="contractTab" role="tabpanel">
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Contract Basics</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Contract Type <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlbasicContractType" name="basic_contract_type">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Contract Value <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="number" id="contract_value" name="contract_value">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Currency <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlCurrency" name="ddlCurrency">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Discount % (if any)</label>
+                                                                        <input class="form-control" type="number" id="discount" name="discount_percent">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Tax % (if any)</label>
+                                                                        <input class="form-control" type="number" id="tax" name="tax_percent">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">SaaS Specific</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-4">
+                                                                        <label class="form-label">Billing Frequency</label>
+                                                                        <select class="form-select" id="ddlBillingFreq" name="bill_freq_id">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-4">
+                                                                        <label class="form-label">Billing Start Date</label>
+                                                                        <input class="form-control" type="date" id="bill_start_date" name="bill_start_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-4">
+                                                                        <label class="form-label">Billing End Date</label>
+                                                                        <input class="form-control" type="date" id="bill_end_date" name="bill_end_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label">Billing Cycle Day</label>
+                                                                        <select class="form-select" id="ddlBillingCycle" name="billing_cycle">
+                                                                            <option value="0" selected>Select Billing Cycle Day</option>
+                                                                            <option value="1">1</option>
+                                                                            <option value="2">2</option>
+                                                                            <option value="3">3</option>
+                                                                            <option value="4">4</option>
+                                                                            <option value="5">5</option>
+                                                                            <option value="6">6</option>
+                                                                            <option value="7">7</option>
+                                                                            <option value="8">8</option>
+                                                                            <option value="9">9</option>
+                                                                            <option value="10">10</option>
+                                                                            <option value="11">11</option>
+                                                                            <option value="12">12</option>
+                                                                            <option value="13">13</option>
+                                                                            <option value="14">14</option>
+                                                                            <option value="15">15</option>
+                                                                            <option value="16">16</option>
+                                                                            <option value="17">17</option>
+                                                                            <option value="18">18</option>
+                                                                            <option value="19">19</option>
+                                                                            <option value="20">20</option>
+                                                                            <option value="21">21</option>
+                                                                            <option value="22">22</option>
+                                                                            <option value="23">23</option>
+                                                                            <option value="24">24</option>
+                                                                            <option value="25">25</option>
+                                                                            <option value="26">26</option>
+                                                                            <option value="27">27</option>
+                                                                            <option value="28">28</option>
+                                                                            <option value="29">29</option>
+                                                                            <option value="30">30</option>
+                                                                            <option value="31">31</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label">Renewal Terms (Month)</label>
+                                                                        <input class="form-control" type="month" id="renewal_terms_months" name="renewal_terms_months">
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <div class="d-flex align-items-center justify-content-between p-3 rounded-3 custom-switch bd-blue-500">
+                                                                            <div>
+                                                                                <p class="mb-1 fw-bold">Auto Renew</p>
+                                                                                <p class="small mb-0">Automatically extend contract at term end.</p>
+                                                                            </div>
+                                                                            <div class="form-check form-switch p-0 m-0 fs-4">
+                                                                                <input class="form-check-input ms-0" type="checkbox" id="auto_renew" name="auto_renew" role="switch">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-secondary text-white">
+                                                                            <i class="fa-solid fa-circle-info"></i>
+                                                                            <p class="mb-0"><b>Renewal Reminder:</b> Notification will be sent to the contract owner 30 days prior to the expiration date.</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Custom Project Specific</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Project Name</label>
+                                                                        <input class="form-control" type="text" id="projectname" name="project_name">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Total Project Value</label>
+                                                                        <input class="form-control" type="number" id="projectvalue" name="project_value">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Number of Milestones</label>
+                                                                        <input class="form-control" type="text" id="milestones" name="no_of_milestones">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Payment Terms</label>
+                                                                        <select class="form-select" id="ddlPaymentTerms" name="payment_term_id">
+                                                                            >
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 mt-3">
+                                                                        <label class="form-label">Penalty Terms</label>
+                                                                        <input class="form-control" type="text" id="remarks" name="penalty_terms">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 mt-3">
+                                                                        <label class="form-label">Support Hours</label>
+                                                                        <input class="form-control" type="text" id="supphours" name="support_hours">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                        </div>
+                                                        <div class="tab-pane fade" id="billingTab" role="tabpanel">
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Core Billing Details</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Billing Type</label>
+                                                                        <select class="form-select" id="ddlBillingType">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Billing Frequency (if recurring)</label>
+                                                                        <select class="form-select" id="ddlBillingFreqRecurring">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Next Billing Date</label>
+                                                                        <input class="form-control" type="date" id="next_billing_date">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Invoicing Preferences</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label w-100">Billing Method <strong style="color:orangered">*</strong></label>
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="radio" name="bill_method" id="rdoAuto" value="Auto">
+                                                                            <label class="form-check-label" for="rdoAuto">Auto Invoice</label>
+                                                                        </div>
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="radio" name="bill_method" id="rdoManual" value="Manual">
+                                                                            <label class="form-check-label" for="rdoManual">Manual Invoice</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label w-100">Invoice Delivery Method <strong style="color:orangered">*</strong></label>
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="radio" name="delivery_method" id="rdoDeliveryEmail" value="Email">
+                                                                            <label class="form-check-label" for="rdoDeliveryEmail">Email</label>
+                                                                        </div>
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="radio" name="delivery_method" id="rdoDeliveryPortal" value="Portal">
+                                                                            <label class="form-check-label" for="rdoDeliveryPortal">Portal</label>
+                                                                        </div>
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="radio" name="delivery_method" id="rdoDeliveryManual" value="Manual">
+                                                                            <label class="form-check-label" for="rdoDeliveryManual">Manual</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                        </div>
+                                                        <div class="tab-pane fade" id="recurringTab" role="tabpanel">
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Event Preference</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Billing Event ID</label>
+                                                                        <input class="form-control" type="text">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Client</label>
+                                                                        <input class="form-control" type="text">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Contract ID</label>
+                                                                        <input class="form-control" type="text">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Billing Period</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label">Billing Start Period</label>
+                                                                        <input class="form-control" type="date" id="bill_start_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label">Billing End Period</label>
+                                                                        <input class="form-control" type="date" id="bill_end_date">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Financial Summary</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Amount: <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="number" id="amount">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Tax (%): <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="number" id="tax">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Total</label>
+                                                                        <input class="form-control" type="number" id="total" disabled>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Due Date: <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="date" id="due_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Status: <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlBillingStatus">
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                        </div>
+                                                        <div class="tab-pane fade" id="milestoneTab" role="tabpanel">
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Milestone Details</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Milestone Name <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="text" id="milestone_name">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Milestone Amount <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="number" id="milestone_amount">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Expected Completion Date <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="date" id="exp_completion_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Completion Date</label>
+                                                                        <input class="form-control" type="date" id="completion_date">
+                                                                    </div>
+
+                                                                    <div class="col-12">
+                                                                        <label class="form-label">Milestone Description</label>
+                                                                        <textarea class="form-control" rows="3" id="milestone_desc"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Team & Approval</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label">Internal Owner <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlInternalOwner">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label">Client Aprover <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlClientApprover">
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Deliverables List</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="multi-field-wrapper">
+                                                                        <div class="multi-fields">
+                                                                            <div class="multi-field d-flex mb-3 gap-2">
+                                                                                <div class="w-95">
+                                                                                    <input type="text" class="form-control deliverables_list" id="deliverables_list">
+                                                                                </div>
+                                                                                <button type="button" class="btn btn-danger btn-md remove-field w-5"><i class="fa-solid fa-trash"></i></button>
+                                                                            </div>
+                                                                        </div>
+                                                                        <button type="button" class="btn btn-primary btn-md add-field">Add</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Dependencies (Optional)</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12">
+                                                                        <input type="text" class="form-control" id="dependencies">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                        </div>
+                                                        <div class="tab-pane fade" id="completionTab" role="tabpanel">
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Milestone Reference</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label">Milestone ID</label>
+                                                                        <input class="form-control" type="text">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label">Completion Date</label>
+                                                                        <input class="form-control" type="date">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body" id="docUpload">
+                                                                <h5 class="mb-3 fw-bold">Evidence Upload <strong style="color:orangered">*</strong></h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 uploader">
+                                                                        <label class="upload-box w-100">
+                                                                            <input type="file" id="docUpload" name="docUpload" class="d-none file-input" multiple accept=".pdf, .doc, .docx">
+                                                                            <h5>Project Scope Document </h5>
+                                                                            <p class="text-muted mb-0">PDF, DOCX, DOC</p>
+                                                                        </label>
+                                                                        <div class="preview-container row"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label w-100">Client Approval <strong style="color:orangered">*</strong></label>
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="radio" name="question" id="rdoYes" value="Yes">
+                                                                            <label class="form-check-label" for="rdoYes">Yes</label>
+                                                                        </div>
+                                                                        <div class="form-check form-check-inline">
+                                                                            <input class="form-check-input" type="radio" name="question" id="rdoNo" value="No">
+                                                                            <label class="form-check-label" for="rdoNo">No</label>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="col-12">
+                                                                        <label class="form-label">Client Comments</label>
+                                                                        <textarea class="form-control" rows="3" id="client_comments"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Quality Assurance</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12">
+                                                                        <label class="form-label">Internal QA Comments</label>
+                                                                        <input type="text" class="form-control" id="qa_comments">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                        </div>
+                                                        <div class="tab-pane fade" id="invoiceTab" role="tabpanel">
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Invoice Details</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Invoice No <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="text" id="invoice_no">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Client <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlClient" name="ddlClient">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Invoice Date <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="date" id="invoice_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Due Date</label>
+                                                                        <input class="form-control" type="date" id="due_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4 mt-lg-auto">
+                                                                        <label class="form-label">Billing Type <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlBillingType" name="ddlBillingType">
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Line Items</h5>
+
+                                                                <button type="button" id="btnAddRow" class="btn btn-primary btn-sm mb-2">
+                                                                    + Add Item
+                                                                </button>
+
+                                                                <div class="row g-3">
+                                                                    <div class="col-12">
+                                                                        <div class="table-responsive">
+                                                                            <table class="table table-bordered invoice-grid">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th style="width:30%">Item Description</th>
+                                                                                        <th style="width:8%" class="text-center">Qty</th>
+                                                                                        <th style="width:12%" class="text-end">Unit Price</th>
+                                                                                        <th style="width:12%" class="text-end">Amount</th>
+                                                                                        <th style="width:8%" class="text-end">Tax %</th>
+                                                                                        <th style="width:12%" class="text-end">Tax Amount</th>
+                                                                                        <th style="width:12%" class="text-end">Total Amount</th>
+                                                                                        <th style="width:6%" class="text-center">Action</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody id="tbltbody">
+                                                                                    <tr>
+                                                                                        <td>
+                                                                                            <input type="text" class="form-control item_desc" placeholder="Item description">
+                                                                                        </td>
+
+                                                                                        <td>
+                                                                                            <input type="number" class="form-control form-control-sm qty text-end" value="1">
+                                                                                        </td>
+
+                                                                                        <td>
+                                                                                            <input type="number" class="form-control form-control-sm unit_price text-end" value="0">
+                                                                                        </td>
+
+                                                                                        <td class="amount text-end align-middle">0.00</td>
+
+                                                                                        <td>
+                                                                                            <input type="number" class="form-control form-control-sm tax_percent text-end" value="0">
+                                                                                        </td>
+
+                                                                                        <td class="tax_amount text-end align-middle">0.00</td>
+
+                                                                                        <td class="total_amount text-end align-middle fw-semibold">0.00</td>
+
+
+                                                                                        <td class="text-center">
+                                                                                            <button type="button" class="btn btn-danger btn-sm btnRemoveRow">
+                                                                                                <i class="feather-trash-2"></i>
+                                                                                            </button>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                                <tfoot>
+                                                                                    <tr>
+                                                                                        <th colspan="6" class="text-end">Subtotal</th>
+                                                                                        <td class="text-end" id="lblSubTotal">0.00</td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <th colspan="6" class="text-end">Tax Total</th>
+                                                                                        <td class="text-end" id="lblTaxTotal">0.00</td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <th colspan="6" class="text-end">Grand Total</th>
+                                                                                        <td class="text-end" id="lblGrandTotal">0.00</td>
+                                                                                    </tr>
+                                                                                </tfoot>
+                                                                            </table>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">References</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Recurring Billing (if SaaS)</label>
+                                                                        <select class="form-select" id="ddlRecurringBilling" name="ddlRecurringBilling">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Milestone (if custom)</label>
+                                                                        <select class="form-select" id="ddlMilestone" name="ddlMilestone">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Contract <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlContract" name="ddlContract">
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body" id="docSection">
+                                                                <h5 class="mb-3 fw-bold">Attachments</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 uploader">
+                                                                        <label class="upload-box w-100">
+                                                                            <input type="file" class="d-none file-input" name="inv_pdf" id="inv_pdf" multiple accept=".pdf, .doc, .docx">
+                                                                            <h5>Invoice PDF</h5>
+                                                                            <p class="text-muted mb-0">PDF</p>
+                                                                        </label>
+                                                                        <div class="preview-container row"></div>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 uploader">
+                                                                        <label class="upload-box w-100">
+                                                                            <input type="file" class="d-none file-input" name="support_pdf" id="support_pdf" multiple accept=".pdf, .doc, .docx">
+                                                                            <h5>Supporting Documents</h5>
+                                                                            <p class="text-muted mb-0">PDF, DOCX, DOC</p>
+                                                                        </label>
+                                                                        <div class="preview-container row"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                        </div>
+
+                                                        <div class="tab-pane fade" id="paymentTab" role="tabpanel">
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Client & Invoice Selection</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-6">
+                                                                        <label class="form-label">Client <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlClient" name="ddlClient">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-6">
+                                                                        <label class="form-label">Invoice No <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlInvoiceNo" name="ddlInvoiceNo">
+                                                                        </select>
+                                                                    </div>
+
+                                                                    <div class="col-12">
+                                                                        <div class="table-responsive">
+                                                                            <table class="table table-bordered" id="tblInvoiceDetail">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>Item Description</th>
+                                                                                        <th class="text-end">Quantity</th>
+                                                                                        <th class="text-end">Unit Price</th>
+                                                                                        <th class="text-end">Amount</th>
+                                                                                        <th class="text-end">Tax %</th>
+                                                                                        <th class="text-end">Tax Amount</th>
+                                                                                        <th class="text-end">Total Amount</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody id="inv_dtl"></tbody>
+                                                                                <tfoot>
+                                                                                    <tr>
+                                                                                        <th colspan="6" class="text-end">Subtotal</th>
+                                                                                        <td class="text-end" id="lblSubTotal">0.00</td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <th colspan="6" class="text-end">Tax Total</th>
+                                                                                        <td class="text-end" id="lblTaxTotal">0.00</td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <th colspan="6" class="text-end">Grand Total</th>
+                                                                                        <td class="text-end" id="lblGrandTotal">0.00</td>
+                                                                                    </tr>
+                                                                                </tfoot>
+                                                                            </table>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">References</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label">Amount Received <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="number" id="amount_received">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6">
+                                                                        <label class="form-label w-100">Payment Mode <strong style="color:orangered">*</strong></label>
+                                                                        <div class="btn-group bg-light px-3 py-1 gap-2" role="group">
+                                                                            <input type="radio" class="btn-check" name="pmode" id="rdoCash" autocomplete="off" checked value="Cash">
+                                                                            <label class="btn rounded" for="rdoCash">Cash</label>
+
+                                                                            <input type="radio" class="btn-check" name="pmode" id="rdoChq" autocomplete="off" value="Cheque">
+                                                                            <label class="btn rounded" for="rdoChq">Cheque</label>
+
+                                                                            <input type="radio" class="btn-check" name="pmode" id="rdoBankTransfer" autocomplete="off" value="Bank Transfer">
+                                                                            <label class="btn rounded" for="rdoBankTransfer">Bank Transfer</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mt-3" id="check">
+                                                                        <div class="col-12 col-md-6 col-lg-4">
+                                                                            <label class="form-label">Checque No</label>
+                                                                            <input class="form-control" type="text" id="chq_no">
+                                                                        </div>
+                                                                        <div class="col-12 col-md-6 col-lg-4">
+                                                                            <label class="form-label">Bank Name</label>
+                                                                            <input class="form-control" type="text" id="bank_name">
+                                                                        </div>
+                                                                        <div class="col-12 col-md-6 col-lg-4">
+                                                                            <label class="form-label">Value Date</label>
+                                                                            <input class="form-control" type="date" id="value_date">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row mt-3 d-none" id="bank">
+                                                                        <div class="col-12 col-md-6 col-lg-4">
+                                                                            <label class="form-label">Reference Number</label>
+                                                                            <input class="form-control" type="text" id="ref_no">
+                                                                        </div>
+                                                                        <div class="col-12 col-md-6 col-lg-4">
+                                                                            <label class="form-label">Transfer Date</label>
+                                                                            <input class="form-control" type="date" id="transfer_date">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div id="docSection" class="col-12 uploader">
+                                                                        <label class="form-label">Receipt Upload</label>
+                                                                        <label class="upload-box w-100">
+                                                                            <input type="file" id="receipt_upload" name="receipt_upload" class="d-none file-input" multiple accept=".pdf, .doc, .docx">
+                                                                            <h5>Click to Upload</h5>
+                                                                            <p class="text-muted mb-0">PDF, DOC, DOCX</p>
+                                                                        </label>
+                                                                        <div class="preview-container row"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                        </div>
+                                                        <div class="tab-pane fade" id="arTab" role="tabpanel">
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Case Information</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Client <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlClient" name="ddlClient">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Invoice No <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlInvoiceNo" name="ddlInvoiceNo">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Amount <strong style="color:orangered">*</strong></label>
+                                                                        <input class="form-control" type="number" id="amount">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label">Days Overdue</label>
+                                                                        <input class="form-control" type="number" id="days_overdue">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label w-100">Risk Category <strong style="color:orangered">*</strong></label>
+                                                                        <div class="btn-group bg-light px-3 py-1 gap-2" role="group">
+                                                                            <input type="radio" class="btn-check" name="rdoRisk" id="riskLow" autocomplete="off" value="Low">
+                                                                            <label class="btn rounded" for="riskLow">Low</label>
+
+                                                                            <input type="radio" class="btn-check" name="rdoRisk" id="riskMedium" autocomplete="off" checked value="Medium">
+                                                                            <label class="btn rounded" for="riskMedium">Medium</label>
+
+                                                                            <input type="radio" class="btn-check" name="rdoRisk" id="riskHigh" autocomplete="off" value="High">
+                                                                            <label class="btn rounded" for="riskHigh">High</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-4">
+                                                                        <label class="form-label w-100">Escalation Level <strong style="color:orangered">*</strong></label>
+                                                                        <div class="btn-group bg-light px-3 py-1 gap-2" role="group">
+                                                                            <input type="radio" class="btn-check" name="rdoEscalation" id="rdoSales" autocomplete="off" value="Sales">
+                                                                            <label class="btn rounded" for="rdoSales">Sales</label>
+
+                                                                            <input type="radio" class="btn-check" name="rdoEscalation" id="rdoFinance" autocomplete="off" checked value="Finance">
+                                                                            <label class="btn rounded" for="rdoFinance">Finance</label>
+
+                                                                            <input type="radio" class="btn-check" name="rdoEscalation" id="rdoCEO" autocomplete="off" value="CEO">
+                                                                            <label class="btn rounded" for="rdoCEO">CEO</label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-12">
+                                                                        <label class="form-label">Notes</label>
+                                                                        <textarea class="form-control" rows="3" id="notes"></textarea>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                        </div>
+                                                        <div class="tab-pane fade" id="renewalTab" role="tabpanel">
+                                                            <div class="card-body">
+                                                                <h5 class="mb-3 fw-bold">Renewal Details</h5>
+                                                                <div class="row g-3">
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Client <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlClient" name="ddlClient">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Contract <strong style="color:orangered">*</strong></label>
+                                                                        <select class="form-select" id="ddlContract" name="ddlContract">
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Renewal Term</label>
+                                                                        <input class="form-control" type="text" id="renewal_term">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">New Contract Value</label>
+                                                                        <input class="form-control" type="number" id="contract_value">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Discount %</label>
+                                                                        <input class="form-control" type="number" id="discount">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">Start Date</label>
+                                                                        <input class="form-control" type="date" id="start_date">
+                                                                    </div>
+                                                                    <div class="col-12 col-md-6 col-lg-3">
+                                                                        <label class="form-label">End Date</label>
+                                                                        <input class="form-control" type="date" id="end_date">
+                                                                    </div>
+
+                                                                    <div id="docSection" class="col-12 uploader">
+                                                                        <label class="form-label">Renewal Document Upload</label>
+                                                                        <label class="upload-box w-100">
+                                                                            <input type="file" name="doc_upload" id="doc_upload" class="d-none file-input" multiple accept=".pdf, .doc, .docx">
+                                                                            <h5>Click to Upload</h5>
+                                                                            <p class="text-muted mb-0">PDF, DOC, DOCX</p>
+                                                                        </label>
+                                                                        <div class="preview-container row"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <hr class="my-0">
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            @if (_allowinsert)
+                            {
+                                <br />
+                                <div class="row ">
+                                    @* <div class="d-flex justify-content-end flex-wrap" id="actionId"></div> *@
+                                    <div class="d-flex justify-content-end flex-wrap" id="actionId">
+                                        <button type="button" class="btn btn-success btn-sm SaveBtn" id="SaveBtn"><i class="feather-save pe-2"></i>Save</button>
+
+                                    </div>
+                                </div>
+                            }
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/vendors.min.js"></script>
+    <script src="~/Public/js/common-init.min.js"></script>
+    <script src="~/Public/js/client-onboarding.js"></script>
+
+    <script src="~/Public/vendor/leaderline/leaderline.js"></script>
+    <script src="~/Public/js/custom-js/Workflow/WorkflowManager.js"></script>
+    <script src="~/Public/js/custom-js/Trans/Index.js"></script>
+}

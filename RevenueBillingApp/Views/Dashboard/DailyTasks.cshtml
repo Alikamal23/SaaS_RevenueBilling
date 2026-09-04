@@ -1,0 +1,114 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "ERP";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section TopCss
+{
+    <link href="~/Public/css/custom-css/Dashboard/DailyTasks.css" rel="stylesheet" />
+}
+
+<div class="page-header mt-3">
+    <div class="page-header-left d-flex align-items-center">
+        <div class="page-header-title">
+            <h5 class="m-b-10">Daily Task</h5>
+        </div>
+    </div>
+</div>
+<div class="row daily-task-row">
+    <div class="col-12">
+        <div class="card daily-tasks-card">
+            <div class="card-body">
+                <div class="tab-content">
+                    <div id="tasks" class="tab-pane active">
+                        <div id="item-container" class="tasks-carousel">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2 daily-task-graph">
+    <div class="col-lg-12">
+        <div class="card daily-task-card">
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col">
+                        <div class="border border-dashed border-gray-5 p-4 rounded-3 gap-4 text-center">
+                            <div class="task-progress-1"></div>
+                            <div class="mt-4">
+                                <p class="fw-bold text-black text-truncate-1-line">My Task</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="border border-dashed border-gray-5 p-4 rounded-3 gap-4 text-center">
+                            <div class="task-progress-2"></div>
+                            <div class="mt-4">
+                                <p class="fw-bold text-black text-truncate-1-line">Overdue Tasks</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="border border-dashed border-gray-5 p-4 rounded-3 gap-4 text-center">
+                            <div class="task-progress-3"></div>
+                            <div class="mt-4">
+                                <p class="fw-bold text-black text-truncate-1-line">My Request</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="border border-dashed border-gray-5 p-4 rounded-3 gap-4 text-center">
+                            <div class="task-progress-4"></div>
+                            <div class="mt-4">
+                                <p class="fw-bold text-black text-truncate-1-line">Overdue Requests</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="border border-dashed border-gray-5 p-4 rounded-3 gap-4 text-center">
+                            <div class="task-progress-5"></div>
+                            <div class="mt-4">
+                                <p class="fw-bold text-black text-truncate-1-line">My Approvals</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row daily-task-table">
+    <div class="col-12">
+        <div class="card custom-card">
+            <div class="card-header">
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table id="gridTaskContainer" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Doc Id</th>
+                                <th>Workflow</th>
+                                <th>Originator</th>
+                                <th>Last Updated</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section BottomJS {
+    <script src="~/Public/vendor/circle-progress/circle-progress.min.js"></script>
+    <script src="~/Public/js/custom-js/Dashboard/DailyTasks.js"></script>
+}

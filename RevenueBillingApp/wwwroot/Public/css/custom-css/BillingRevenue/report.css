@@ -1,0 +1,457 @@
+﻿/* =========================================================
+   REPORT PAGE
+   ========================================================= */
+
+body {
+    background: #f4f6f9;
+    font-family: Calibri, Arial, sans-serif;
+    color: #1f334d;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   MAIN WRAPPER
+   ========================================================= */
+
+.report-wrapper {
+    width: 94%;
+    max-width: 1400px;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 28px 32px;
+    border: 1px solid #e1e5ea;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+
+/* =========================================================
+   REPORT HEADER
+   ========================================================= */
+
+.report-header {
+    text-align: center;
+    padding-bottom: 18px;
+    border-bottom: 2px solid #1f4e79;
+    margin-bottom: 20px;
+}
+
+.report-title {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: #173b5f;
+    text-transform: uppercase;
+}
+
+.report-subtitle {
+    font-size: 14px;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
+
+/* =========================================================
+   PARAMETERS
+   ========================================================= */
+
+.report-parameters {
+    border: 1px solid #dce2e8;
+    border-radius: 5px;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.parameter-header {
+    background: #f1f4f7;
+    border-bottom: 1px solid #dce2e8;
+    padding: 10px 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #173b5f;
+}
+
+.parameter-body {
+    padding: 14px 10px 4px 10px;
+}
+
+.parameter-item {
+    margin-bottom: 12px;
+}
+
+.parameter-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #68798a;
+    margin-bottom: 3px;
+}
+
+.parameter-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f334d;
+}
+
+
+/* =========================================================
+   REPORT DATA
+   ========================================================= */
+
+.report-data {
+    width: 100%;
+}
+
+.report-table {
+    width: 100%;
+    margin-bottom: 0;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+    .report-table thead th {
+        background-color: #193f66 !important;
+        color: #ffffff !important;
+        font-weight: 600;
+        text-align: left;
+        vertical-align: middle;
+        border-color: #193f66 !important;
+    }
+
+    .report-table tbody td {
+        padding: 8px;
+        border: 1px solid #dee2e6;
+        vertical-align: middle;
+        color: #1d2f43;
+    }
+
+    .report-table tbody tr:nth-child(even) {
+        background: #f7f9fb;
+    }
+
+    .report-table tbody tr:hover {
+        background: #eef4f9;
+    }
+
+    .report-table tbody td:first-child {
+        text-align: center;
+        font-weight: 600;
+    }
+
+    #pdfDatatable thead tr th {
+        background-color: #193f66 !important;
+        color: #fff !important;
+        font-weight: 600 !important;
+        text-align: left;
+        vertical-align: middle;
+        border-color: #193f66 !important;
+    }
+
+    #pdfDatatable thead th {
+        color: #fff !important;
+    }
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.report-footer {
+    margin-top: 24px;
+}
+
+.footer-line {
+    border-top: 1px solid #d9dee4;
+    margin-bottom: 8px;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: #6c757d;
+}
+
+    .footer-content strong {
+        color: #34495e;
+    }
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .report-wrapper {
+        width: 100%;
+        margin: 10px auto;
+        padding: 18px;
+        box-shadow: none;
+    }
+
+    .report-title {
+        font-size: 20px;
+    }
+
+    .report-table {
+        font-size: 11px;
+    }
+
+        .report-table thead th,
+        .report-table tbody td {
+            padding: 6px;
+        }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 5px;
+        text-align: center;
+    }
+}
+
+
+/* =========================================================
+   PRINT / PDF
+   ========================================================= */
+
+@media print {
+
+    body {
+        background: #ffffff !important;
+        margin: 0;
+        padding: 0;
+    }
+
+    .report-wrapper {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 10px;
+        border: none;
+        box-shadow: none;
+    }
+
+    .report-header {
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+    }
+
+    .report-title {
+        font-size: 20px;
+    }
+
+    .report-subtitle {
+        font-size: 12px;
+    }
+
+    .report-parameters {
+        margin-bottom: 15px;
+    }
+
+    .parameter-header {
+        padding: 7px 10px;
+    }
+
+    .parameter-body {
+        padding: 8px;
+    }
+
+    .parameter-item {
+        margin-bottom: 6px;
+    }
+
+    .report-table {
+        font-size: 9px;
+    }
+
+        .report-table thead th {
+            background: #173b5f !important;
+            color: #ffffff !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .report-table tbody tr:nth-child(even) {
+            background: #f7f9fb !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .report-table tr {
+            page-break-inside: avoid;
+        }
+
+    .report-footer {
+        margin-top: 15px;
+    }
+
+    @page {
+        size: A4 landscape;
+        margin: 8mm;
+    }
+}
+
+
+.report-export-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.report-icon-btn {
+    width: 32px;
+    height: 28px;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+    .report-icon-btn:hover {
+        transform: translateY(-1px);
+    }
+
+
+/* =========================================================
+   REPORT PAGE - REMOVE LAYOUT PADDING
+   ========================================================= */
+
+/*.nxl-container .nxl-content .main-content {
+    padding: 0 !important;
+}*/
+
+/* =========================================
+   REPORT HEADER
+   ========================================= */
+
+#reportResult .report-header {
+    background: #1f4e79;
+    color: #ffffff;
+}
+
+    #reportResult .report-header .report-title {
+        color: #ffffff !important;
+    }
+
+    #reportResult .report-header .report-subtitle {
+        color: #ffffff !important;
+    }
+
+/* =========================================================
+   DASHBOARD EMBEDDED REPORT - TABLE HEADER FIX
+   ========================================================= */
+
+#reportResult .report-table thead,
+#reportResult .report-table thead tr,
+#reportResult .report-table thead tr th,
+#reportResult #pdfDatatable thead,
+#reportResult #pdfDatatable thead tr,
+#reportResult #pdfDatatable thead tr th {
+    background-color: #193f66 !important;
+    color: #ffffff !important;
+}
+
+    #reportResult .report-table thead th *,
+    #reportResult #pdfDatatable thead th * {
+        color: #ffffff !important;
+    }
+
+
+/* =========================================================
+   PDF EXPORT MODE
+   ========================================================= */
+
+body.pdf-export-mode .report-wrapper {
+    overflow: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+body.pdf-export-mode .report-export-buttons,
+body.pdf-export-mode .report-pagination {
+    display: none !important;
+}
+
+body.pdf-export-mode table {
+    width: 100% !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+}
+
+body.pdf-export-mode th,
+body.pdf-export-mode td {
+    overflow: hidden !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+body.pdf-export-mode table {
+    font-size: 8px !important;
+}
+
+body.pdf-export-mode th,
+body.pdf-export-mode td {
+    padding: 4px 3px !important;
+    white-space: normal !important;
+}
+
+
+
+/* =========================================================
+   REPORT TITLE BAR - Force white text (theme.css override)
+   ========================================================= */
+.report-title-bar,
+.report-title-bar h4,
+.report-title-bar p {
+    color: #ffffff !important;
+}
+
+    .report-title-bar h4 {
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .report-title-bar p {
+        margin-bottom: 0;
+        opacity: 0.9;
+    }
+
+.report-title-bar {
+    background: #1d4a73;
+}
+
+.report-wrapper table thead {
+    background: #1d4a73 !important;
+    color: #ffffff !important;
+}
+
+    .report-wrapper table thead th {
+        color: #ffffff !important;
+    }
+
+/* =========================================================
+   REPORT EXCEL EXPORT BUTTON
+   ========================================================= */
+#btnExportDueInvoiceExcel,
+.report-wrapper .btn-outline-success {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 6px;
+}
+
+    #btnExportDueInvoiceExcel i,
+    .report-wrapper .btn-outline-success i {
+        font-size: 14px;
+        margin-right: 0; /* gap property se spacing already ho rahi hai, margin hata do double-spacing na ho */
+    }
+
+.report-wrapper .card-body {
+    padding: 24px;
+}
+

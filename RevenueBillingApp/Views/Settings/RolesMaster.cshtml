@@ -1,0 +1,102 @@
+﻿@inject RevenueBillingApp.Models.Session.Sessions Sessions_
+@{
+    ViewBag.Title = "Roles Master";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section TopCss {
+    @* <link href="~/Public/css/custom-css/Settings/RoleMaster.css" rel="stylesheet" /> *@
+}
+
+@{
+
+    System.Security.Claims.ClaimsPrincipal claimsPrincipal = Context.User;
+    var UniqueKey = (from c in claimsPrincipal.Claims where c.Type == "Guid" select c.Value).FirstOrDefault();
+    var UserID = (from c in claimsPrincipal.Claims where c.Type == "UserID" select c.Value).FirstOrDefault();
+
+    RevenueBillingApp.Models.Session.SessionItems sessionItems = Sessions_.GetSession(UniqueKey, UserID);
+
+    List<RevenueBillingApp.Models.Authentication.RolesMapping> rolesMapping = sessionItems.rolesMapping;
+
+    var FilterForm = rolesMapping.FirstOrDefault(x => x.FormName == Context.Request.RouteValues["controller"] + "/" + Context.Request.RouteValues["action"]);
+    bool _allowinsert = FilterForm.AllowInsert;
+    bool _allowupdate = FilterForm.AllowUpdate;
+    bool _allowdelete = FilterForm.AllowDelete;
+}
+<div class="row">
+    <div class="col-12">
+        <div class="card stretch stretch-full">
+            <div class="card-header">
+                <h5 class="card-title">Roles Master</h5>
+            </div>
+            <div class="card-body">
+                <form id="rolesmasterform" name="rolesmasterform" method="post" action="">
+                    <div class="row">
+                        <div class="d-none">
+                            <input type="hidden" value="" id="s-roleid" name="RoleID" />
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                            <label>Role Name</label>
+                            <input type="text" class="form-control" id="s-rolename" name="RoleName" required>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-2 mt-lg-auto">
+                            <input class="checkboxsize" type="checkbox" id="s-active" name="IsActive">
+                            <label>Active</label>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-4 mt-3 mt-lg-auto">
+                            @if (_allowinsert)
+                            {
+                                <button class="btn btn-primary btn-sm btn-block savebutton" type="button" id="SaveBtn"><i class='feather-save me-2'></i>Save</button>
+                            }
+                            @if (_allowupdate)
+                            {
+                                <button class="btn btn-primary btn-sm btn-block d-none updatebutton" type="button" id="UpdateBtn"><i class='feather-save me-2'></i>Update</button>
+                            }
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body p-0">
+                <div id="RolesMasterDiv">
+                    <div class="div-loader">
+                        <div class="loader-wrapper d-none">
+                            <span class="loader"></span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="role-master">
+                                <thead>
+                                    <tr>
+                                        <th>Role Name</th>
+                                        <th>Active</th>
+                                        @if (_allowupdate)
+                                        {
+                                            <th>Edit</th>
+                                        }
+                                        @if (_allowdelete)
+                                        {
+                                            <th>Delete</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section BottomJS {
+    <script src="~/Public/js/custom-js/Settings/RolesMaster.js"></script>
+}
