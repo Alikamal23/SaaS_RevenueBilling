@@ -5466,38 +5466,38 @@ $(document).on("change", "#ddlRenewalTerm", function () {
     $("#renew_end_date").val(endDate.toISOString().split('T')[0]);
 });
 
-////$(document).on("click", "#btnConvertToContract", function () {
-////    var renewId = $(this).attr("data-id");
+//////$(document).on("click", "#btnConvertToContract", function () {
+//////    var renewId = $(this).attr("data-id");
 
-////    if (!renewId) {
-////        Swal.fire({ icon: "warning", title: "No Approved Renewal", text: "Koi Approved renewal nahi mili." });
-////        return;
-////    }
+//////    if (!renewId) {
+//////        Swal.fire({ icon: "warning", title: "No Approved Renewal", text: "Koi Approved renewal nahi mili." });
+//////        return;
+//////    }
 
-////    Swal.fire({
-////        title: "Convert to New Contract?",
-////        text: "Yeh renewal ko naya contract banayega. Continue?",
-////        icon: "question",
-////        showCancelButton: true
-////    }).then((r) => {
-////        if (!r.value) return;
+//////    Swal.fire({
+//////        title: "Convert to New Contract?",
+//////        text: "Yeh renewal ko naya contract banayega. Continue?",
+//////        icon: "question",
+//////        showCancelButton: true
+//////    }).then((r) => {
+//////        if (!r.value) return;
 
-////        new APICALL(GetGlobalURL('Base', 'ConvertRenewalToContract') + '?renewId=' + renewId, 'POST', '', true)
-////            .FETCH((result, error) => {
-////                if (error) {
-////                    Swal.fire({ icon: 'error', title: 'Error', text: error.data.responseText });
-////                    return;
-////                }
+//////        new APICALL(GetGlobalURL('Base', 'ConvertRenewalToContract') + '?renewId=' + renewId, 'POST', '', true)
+//////            .FETCH((result, error) => {
+//////                if (error) {
+//////                    Swal.fire({ icon: 'error', title: 'Error', text: error.data.responseText });
+//////                    return;
+//////                }
 
-////                Swal.fire({
-////                    icon: "success",
-////                    title: "Contract Created",
-////                    text: "Naya contract successfully ban gaya."
-////                }).then(() => {
-////                    var newContractId = result.data.data[0].new_contract_id;
-////                    var clientId = result.data.data[0].client_id;
-////                    window.location.href = "/BillingRevenue/ClientOnboarding?ClientId=" + clientId + "&ContractId=" + newContractId + "&type=editfromgrid";
-////                });
-////            });
-////    });
-////});
+//////                Swal.fire({
+//////                    icon: "success",
+//////                    title: "Contract Created",
+//////                    text: "Naya contract successfully ban gaya."
+//////                }).then(() => {
+//////                    var newContractId = result.data.data[0].new_contract_id;
+//////                    var clientId = result.data.data[0].client_id;
+//////                    window.location.href = "/BillingRevenue/ClientOnboarding?ClientId=" + clientId + "&ContractId=" + newContractId + "&type=editfromgrid";
+//////                });
+//////            });
+//////    });
+//////});
