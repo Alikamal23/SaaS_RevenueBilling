@@ -38,7 +38,7 @@ $(document).ready(function () {
                 skipContractSave = false;
                 return true;
             }
-
+            
             // Previous Step always allowed
             if (newIndex < currentIndex)
                 return true;
