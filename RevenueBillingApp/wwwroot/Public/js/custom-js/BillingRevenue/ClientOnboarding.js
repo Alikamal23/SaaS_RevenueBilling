@@ -4046,6 +4046,7 @@ function GetInvoiceGrid(client_id = 0, contract_id = 0) {
                                 '<td>' + FormatDate(option.due_date) + '</td>' +
                                 '<td>' + (option.currency_code || '-') + '</td>' +
                                 '<td class="text-end">' + parseFloat(option.total_amount || 0).toLocaleString() + '</td>' +
+                                '<td class="text-end">' + parseFloat(option.total_PKR_amount || 0).toLocaleString() + '</td>' +
                                 '<td>' + invoiceStatus + '</td>' +
                                 '<td>' + paymentStatus + '</td>' +
                                 '<td class="text-center">' + action + '</td>' +

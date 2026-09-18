@@ -26,10 +26,10 @@
         "AM_TARGET_API": "https://localhost:7163",
         
         //local db
-        "AM_DATABASE": "w11Hxo/pGLufqhu/.MhAZ7YyNWF8BK3FwoklNpV8JdizHFii5py4quLs6oarCCeSWBb747Jw/syO+qzd+LiVBVX5R/wrGLiJAk3d4N+nueG/DC3H5qDYaQFVE98AcIjVL9wkvBT9qpzdb0UMtjM87IA==.e7uxZZGXqzsfaN4pxvEsKg==",
+        //"AM_DATABASE": "w11Hxo/pGLufqhu/.MhAZ7YyNWF8BK3FwoklNpV8JdizHFii5py4quLs6oarCCeSWBb747Jw/syO+qzd+LiVBVX5R/wrGLiJAk3d4N+nueG/DC3H5qDYaQFVE98AcIjVL9wkvBT9qpzdb0UMtjM87IA==.e7uxZZGXqzsfaN4pxvEsKg==",
 
         // staging db
-        //"AM_DATABASE": "sNSxeNtp5JOnkhy5.5mTt9nWvLikoZtdywB7eLnyL9vZ/imy2iMHFy3pLeiytJkX+w1U/BcDipxUoh11MYckZBimvDx+L3WSnRHWhKgubQCb+WPywidTxqqfMFtUAJrLpYHFn2yiUNd4ovLqY7OiF9AXYHX5HSKUH3JcxO6y7zJY+CT8GnQDaQ/lVchvESMTJ8MYC3fPIebN1+y+N+nPzIQ==.Hbr0/r3vGpTbekRI9B1e+g==",
+        "AM_DATABASE": "sNSxeNtp5JOnkhy5.5mTt9nWvLikoZtdywB7eLnyL9vZ/imy2iMHFy3pLeiytJkX+w1U/BcDipxUoh11MYckZBimvDx+L3WSnRHWhKgubQCb+WPywidTxqqfMFtUAJrLpYHFn2yiUNd4ovLqY7OiF9AXYHX5HSKUH3JcxO6y7zJY+CT8GnQDaQ/lVchvESMTJ8MYC3fPIebN1+y+N+nPzIQ==.Hbr0/r3vGpTbekRI9B1e+g==",
         
 
         "AM_JWT_KEY": "$M!G-SF12345%,dns1.namingserver1.com",
