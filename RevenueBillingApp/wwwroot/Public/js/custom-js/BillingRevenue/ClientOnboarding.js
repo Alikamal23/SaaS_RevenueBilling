@@ -102,7 +102,7 @@ $(document).ready(function () {
                             $("#hdnContractId").val()
                         );
 
-                        DisableContractTab(true);
+                        //DisableContractTab(true);
 
                     }, 100);
 
@@ -782,7 +782,7 @@ function PopulateFieldsOnEdit() {
         ////hide add new button always
         //$("#btnAddNewInvoice").addClass("d-none");
 
-        DisableContractTab(true);
+        //DisableContractTab(true);
 
         $("#CustomerRadioBoxBlock").hide();
         $("#primary_contact_phone").prop("disabled", true);
@@ -853,7 +853,7 @@ function PopulateFieldsOnEdit() {
     else {
         $("#paymentGrid").show();      // show Payment Grid
 
-        DisableContractTab(false);
+        //DisableContractTab(false);
 
         $("#CustomerRadioBoxBlock").show();
         $("#primary_contact_phone").prop("disabled", false);
@@ -3917,7 +3917,10 @@ function LoadMaxInvoiceID() {
             }
 
             if (result.data != null && result.data.length > 0) {
-                ////console.log('dsdasdasdas');
+                console.log('dsdasdasdas');
+                console.log(result.data);
+
+
                 $("#hdnInvoiceId").val(0);
 
                 ////console.log('ref No: ' + result.data[0].ReferenceNo);
