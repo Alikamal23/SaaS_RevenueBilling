@@ -377,8 +377,8 @@ $(document).ready(function () {
     $("#noMilestone").on("input", function () {
         this.value = this.value.replace(/[^0-9]/g, "");
 
-        if (parseInt(this.value) > 10) {
-            this.value = 10;
+        if (parseInt(this.value) > 12) {
+            this.value = 12;
         }
     });
 
@@ -418,13 +418,13 @@ $(document).ready(function () {
     $("#noMilestone").on("input", function () {
         var value = parseInt($(this).val()) || 0;
 
-        if (value > 10) {
-            $(this).val(10);
+        if (value > 12) {
+            $(this).val(12);
 
             Swal.fire({
                 icon: "warning",
                 title: "Maximum Limit",
-                text: "You can create a maximum of 10 milestones."
+                text: "You can create a maximum of 12 milestones."
             });
         }
 
@@ -1200,15 +1200,15 @@ function generateMilestoneGrid() {
     if (milestone <= 0)
         return;
 
-    if (milestone > 10) {
+    if (milestone > 12) {
         Swal.fire({
             icon: "warning",
             title: "Invalid Milestones",
-            text: "Maximum 10 milestones are allowed."
+            text: "Maximum 12 milestones are allowed."
         });
 
-        $("#noMilestone").val(10).focus();
-        milestone = 10;
+        $("#noMilestone").val(12).focus();
+        milestone = 12;
     }
 
     var amount = finalAmount / milestone;
@@ -1247,7 +1247,6 @@ function generateMilestoneGrid() {
 
     // Agar Contract Edit Mode hai to naye controls bhi disable kar do
     if ($("#hdnContractEditMode").val() == "1") {
-
         console.log('line reached.... means edit mode contract');
 
         $("#tblMilestone")
