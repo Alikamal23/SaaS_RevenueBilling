@@ -1211,7 +1211,12 @@ function generateMilestoneGrid() {
         milestone = 12;
     }
 
-    var amount = finalAmount / milestone;
+
+    //var amount = finalAmount / milestone;
+
+    var perMilestoneAmount = Math.floor((finalAmount / milestone) * 100) / 100;
+    var runningTotal = 0;
+
 
     $("#tblMilestone tbody").html("");
 
@@ -1230,11 +1235,23 @@ function generateMilestoneGrid() {
     //}
 
     for (var i = 1; i <= milestone; i++) {
+
+        var rowAmount;
+        if (i < milestone) {
+            rowAmount = perMilestoneAmount;
+            runningTotal += rowAmount;
+        } else {
+            rowAmount = parseFloat((finalAmount - runningTotal).toFixed(2));
+        }
+
+        //<input type="number" class="text-end form-control form-control-sm milestoneAmount" value="${amount.toFixed(2)}">
+        //rowAmount
+
         $("#tblMilestone tbody").append(`
             <tr data-milestone-no="${i}" data-status="Pending">
                 <td>Milestone ${i}</td>
                 <td>
-                    <input type="number" class="text-end form-control form-control-sm milestoneAmount" value="${amount.toFixed(2)}">
+                    <input type="number" class="text-end form-control form-control-sm milestoneAmount" value="${rowAmount.toFixed(2)}">
                 </td>
                 <td>
                     <input type="date" class="form-control form-control-sm milestoneDate">
