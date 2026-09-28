@@ -826,14 +826,14 @@ function PopulateFieldsOnEdit() {
         GetRenewalGrid(clientId, contractId);
 
 
-        if ($("#ddlbasicContractType").val() == "1") {
-            //show add new button on SaaS Contract
-            $("#btnAddNewInvoice").removeClass("d-none");
+        //if ($("#ddlbasicContractType").val() == "1") {
+        //    //show add new button on SaaS Contract
+        //    $("#btnAddNewInvoice").removeClass("d-none");
 
-        } else { //Custom Milestone
-            //hide add new button on Custom Contract
-            $("#btnAddNewInvoice").addClass("d-none");
-        }
+        //} else { //Custom Milestone
+        //    //hide add new button on Custom Contract
+        //    $("#btnAddNewInvoice").addClass("d-none");
+        //}
 
 
         /*GetInvoiceGrid(clientId, contractId);*/
@@ -1907,7 +1907,7 @@ function DecideInvoiceView(clientId, contractId) {
                 ////$("#btnAddNewInvoice").addClass("d-none");
 
             }
-
+            
             if ($("#ddlbasicContractType").val() == "1") {
                 //show add new button on SaaS Contract
                 $("#btnAddNewInvoice").removeClass("d-none");
@@ -2073,6 +2073,29 @@ function FillClientContractForEdit(clientId, contractId) {
                     contract.auto_renew == "1"
                 );
 
+                //setTimeout(function () {
+                //    $("#ddlbasicContractType").val(contract.basic_contract_type).trigger("change");
+                //    $("#ddlBillingFreq").val(contract.bill_freq_id).trigger("change");
+                //    $("#ddlBillingType").val(contract.bill_type_id).trigger("change");
+                //    $("#ddlCurrency").val(contract.currency_id).trigger("change");
+                //    $("#ddlBillingCycle").val(contract.billing_cycle).trigger("change");
+                //    $("#ddlPaymentTerms").val(contract.payment_term_id).trigger("change");
+
+                //    //invoice Tab contracttype
+                //    $("#invTab_contracttype").val(contract.basic_contract_type).trigger("change");
+                //    $("#paym_contracttype").val(contract.basic_contract_type).trigger("change");
+                //    $("#ar_contracttype").val(contract.basic_contract_type).trigger("change");
+                //    $("#renew_contracttype").val(contract.basic_contract_type).trigger("change");
+
+                //// ADD NEW INVOICE BUTTON
+                //if (parseInt(contract.basic_contract_type) === 1) {
+                //    $("#btnAddNewInvoice").removeClass("d-none");
+                //} else {
+                //    $("#btnAddNewInvoice").addClass("d-none");
+                //}
+
+                //}, 200);
+
                 setTimeout(function () {
                     $("#ddlbasicContractType").val(contract.basic_contract_type).trigger("change");
                     $("#ddlBillingFreq").val(contract.bill_freq_id).trigger("change");
@@ -2081,12 +2104,28 @@ function FillClientContractForEdit(clientId, contractId) {
                     $("#ddlBillingCycle").val(contract.billing_cycle).trigger("change");
                     $("#ddlPaymentTerms").val(contract.payment_term_id).trigger("change");
 
-                    //invoice Tab contracttype
+                    // Invoice Tab contract type
                     $("#invTab_contracttype").val(contract.basic_contract_type).trigger("change");
                     $("#paym_contracttype").val(contract.basic_contract_type).trigger("change");
                     $("#ar_contracttype").val(contract.basic_contract_type).trigger("change");
                     $("#renew_contracttype").val(contract.basic_contract_type).trigger("change");
+
+                    // =====================================================
+                    // SHOW / HIDE ADD NEW INVOICE BUTTON
+                    // IMPORTANT: Dropdown is already filled here
+                    // =====================================================
+
+                    if (String(contract.basic_contract_type) === "1") {
+                        // SaaS
+                        $("#btnAddNewInvoice").removeClass("d-none");
+
+                    } else {
+                        // Custom Milestone
+                        $("#btnAddNewInvoice").addClass("d-none");
+                    }
+
                 }, 200);
+
 
                 //-----------------------
                 // Existing Files (Contract Docs)
