@@ -3198,6 +3198,20 @@ namespace RevenueBillingApp.Controllers
         }
         #endregion
 
+
+        //GetCurrencyRate [conversion rate in Invoice Tab]
+        #region GetCurrencyRate
+        [HttpGet]
+        [TypeFilter(typeof(AllowedApiAccess))]
+        public IActionResult GetCurrencyRate(int CurrencyId)
+        {
+            UserInfo _info = _requestClient.GetUserInformation();
+
+            HttpResponseMessage response = _requestClient.UseHttpClientGet("?CurrencyId=" + CurrencyId, "GetCurrencyRate", "BillingRevenue");
+            return new HttpResponseMessageResult(response);
+        }
+        #endregion
+
         #region SaveClientonBoarding
         [HttpPost]
         [TypeFilter(typeof(AllowedApiAccess))]

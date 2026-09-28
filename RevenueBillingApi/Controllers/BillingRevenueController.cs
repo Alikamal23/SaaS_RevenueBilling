@@ -2851,6 +2851,34 @@ namespace RevenueBillingApi.Controllers
         }
         #endregion
 
+        //GetCurrencyRate [conversion rate in Invoice Tab]
+        #region GetCurrencyRate 
+        [RateLimitMiddleware(100, 5)]
+        [HttpGet]
+        public IActionResult GetCurrencyRate(int CurrencyId)
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                NameValueCollection nv = new NameValueCollection();
+                nv.Add("CurrencyId-INT", CurrencyId.ToString());
+                dt = _DAL.GetData("sp_GetCurrencyRate", nv, _DAL.CSManagementPortalDatabase);
+
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    SystemActivityLog(ActivityLog.ActivityID_Get, ActivityLog.ActivityDetails_Get + "sp_GetCurrencyRate");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("{0} {1} {2}", "MasterSetupController", MethodBase.GetCurrentMethod().Name, ex.Message);
+                SystemActivityLog(ActivityLog.ActivityID_Error, MethodBase.GetCurrentMethod().Name + " " + ex.Message);
+                BadRequest(ex.Message);
+            }
+            return Ok(dt);
+        }
+        #endregion
+
         #region BR_SaveClientonBoarding
         [RateLimitMiddleware(50, 5)]
         [HttpPost]

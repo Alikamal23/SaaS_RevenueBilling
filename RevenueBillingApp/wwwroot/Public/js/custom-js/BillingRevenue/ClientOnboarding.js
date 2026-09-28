@@ -758,6 +758,10 @@ $(document).ready(function () {
 
         LoadMaxInvoiceID();
         SetDefaultInvoiceAmounts();
+        //conversion rate & AmountinPKR
+        //new function()
+        SetInvoiceCurrencyConversion();
+
     });
 
     //++******* start Preview Document on Modal Form
@@ -1183,6 +1187,47 @@ function calculateInvoiceAmount() {
     $("#invTaxAmount").val(taxAmt.toFixed(2));
     $("#txtInvoiceAmount").val(total.toFixed(2));
 }
+function SetInvoiceCurrencyConversion() {
+    var CurrencyId = $("#ddlCurrency").val();   // Contract Currency
+    ////alert(CurrencyId);
+
+    var invoiceAmount = parseFloat($("#txtInvoiceAmount").val()) || 0;
+
+    if (!CurrencyId || invoiceAmount <= 0) {
+        $("#txtCurrencyConvRate").val("");
+        $("#txtTotalAmountPKR").val("");
+        return;
+    }
+
+    // Currency Rate API
+    new APICALL(GetGlobalURL('Base', 'GetCurrencyRate') + '?CurrencyId=' + CurrencyId,
+        'GET',
+        '',
+        false)
+        .FETCH((result, error) => {
+
+            if (result && result.data) {
+                //console.log(result.data[0]);
+                var rate = parseFloat(result.data[0].CurrencyRate) || 0;
+
+                //console.log('currency rate: ' + result.data[0].CurrencyRate);
+
+                $("#txtCurrConvRate").val(rate.toFixed(6));
+
+                var amountPKR = invoiceAmount * rate;
+                $("#txtInvoiceAmountPKR").val(amountPKR.toFixed(2));
+            }
+
+        if (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error...',
+                text: error.data.responseText,
+                footer: ''
+            });
+        }
+    });
+}
 function calculateMilestoneAmount() {
     var projectValue = parseFloat($("#projectValue").val()) || 0;
     var discountPer = parseFloat($("#m_discountper").val()) || 0;
@@ -1315,7 +1360,7 @@ function ClearForm(formId) {
 
 // +++++++ ******** start existing client search by name or mobile number **********************
 function FillExistingClient(searchValue) {
-    console.log("Searching Client:", searchValue);
+    //console.log("Searching Client:", searchValue);
 
     new APICALL(
         GetGlobalURL('Base', 'FillExistingClient')
@@ -3125,8 +3170,6 @@ function ValidateRenewal() {
     }
     return true;
 }
-
-
 
 // ++++ Regex function ++++++++
 function isValidNTN(ntn) {
@@ -5182,7 +5225,6 @@ function FileInfo() {
     });
 
 }
-
 
 
 //++++++++++++ Last Two Tabs ARException and Renewal ++++++++++
