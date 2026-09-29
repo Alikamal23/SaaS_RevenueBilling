@@ -746,6 +746,7 @@ $(document).ready(function () {
 
     $(document).on("input", "#invGrossAmount, #invBaseAmount, #invDiscountPercent, #invTaxPercent", function () {
         calculateInvoiceAmount();
+        SetInvoiceCurrencyConversion();
     });
 
     $("#btnAddNewInvoice").click(function () {
@@ -1192,6 +1193,7 @@ function SetInvoiceCurrencyConversion() {
     ////alert(CurrencyId);
 
     var invoiceAmount = parseFloat($("#txtInvoiceAmount").val()) || 0;
+    //alert(invoiceAmount);
 
     if (!CurrencyId || invoiceAmount <= 0) {
         $("#txtCurrencyConvRate").val("");

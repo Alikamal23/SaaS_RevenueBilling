@@ -110,15 +110,15 @@ function ViewGrid() {
 
                             $('#user-master tbody').append(
                                 '<tr id="rowid-' + i + '">' +
-                                    /*'<td>' + option.client_id + '</td>' +*/
-                                '<td>' + (option.client_name || '') + '</td>' +
-                                '<td>' + (option.contract_refno || '') + '</td>' +
-                                '<td>' + (option.contractType || '') + '</td>' +
-                                '<td>' + (option.billingFrequency || '') + '</td>' +
-                                '<td>' + (option.contractperiod || '') + '</td>' +
-                                '<td>' + (FormatAmount(option.valuepricing, true) || '') + '</td>' +
-                                '<td>' + (option.renewaltype || '') + '</td>' +
-                                '<td>' + FormatDate(option.createdon) + '</td>' +
+                                    '<td>' + option.client_id + '</td>' +
+                                    '<td class="client-name">' + (option.client_name || '') + '</td>' +
+                                    '<td>' + (option.contract_refno || '') + '</td>' +
+                                    '<td>' + (option.contractType || '') + '</td>' +
+                                    '<td>' + (option.billingFrequency || '') + '</td>' +
+                                    '<td>' + (option.contractperiod || '') + '</td>' +
+                                    '<td>' + (FormatAmount(option.valuepricing, true) || '') + '</td>' +
+                                    '<td>' + (option.renewaltype || '') + '</td>' +
+                                    '<td>' + FormatDate(option.createdon) + '</td>' +
                                     ProgressBar +
                                     PrintBtn +
                                     UpdateBtn +

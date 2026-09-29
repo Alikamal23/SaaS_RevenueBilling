@@ -1116,3 +1116,8 @@ span.select2-container.select2-container--default.select2-container--open {
     flex: none !important;
     width: 100%;
 }
+
+/* Client List - Client Name Left Align */
+#user-master tbody td.client-name {
+    text-align: left !important;
+}
