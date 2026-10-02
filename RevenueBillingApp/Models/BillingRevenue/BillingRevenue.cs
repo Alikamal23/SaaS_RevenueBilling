@@ -217,6 +217,8 @@
 
         public string? PONo { get; set; }
 
+        public decimal? conv_rate { get; set; }
+
         public int createdby { get; set; }
         public DateTime? createdon { get; set; }
 
@@ -449,5 +451,12 @@
         public int renew_id { get; set; }
         public int createdby { get; set; }
     }
+
+    public class BR_CancelInvoiceInfo
+    {
+        public int invoice_id { get; set; }
+        public int? userid { get; set; }
+    }
+
 
 }

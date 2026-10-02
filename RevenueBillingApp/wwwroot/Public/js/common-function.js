@@ -84,26 +84,25 @@ function ConvertNumberToWords(num) {
         num = Math.floor(num / 1000);
         unitIdx++;
     }
-    return words.trim() + ' Only';
+    return words.trim(); // + ' Only';
 }
 
 
 // ********* VIEW, DOWNLOAD AND EMAIL BUTTONS CODE (GENERIC) ********************
 function BuildInvoiceHtml(invoice, milestones) {
+    //console.log(invoice);
+    //console.log(milestones);
+
     milestones = milestones || [];
 
     var rows = "";
     var grandTotal = 0;
 
-    //console.log(invoice);
-    //console.log(milestones);
-
     // Currency ke mutabik variables set karna (PKR vs Foreign Currency)
     var currId = parseInt(invoice.currency_id || 0);
     var currCode = invoice.currency_code;
-    var convRate = parseFloat(invoice.conversion_rate || 0);
+    var convRate = parseFloat(invoice.conversion_rate || 0).toFixed(6);
     var isPKR = (currCode === "PKR");
-
 
     var grossAmt = parseFloat(invoice.gross_amount || 0);
     var discPercent = parseFloat(invoice.discount_percent || 0);
@@ -117,27 +116,15 @@ function BuildInvoiceHtml(invoice, milestones) {
     var NET_AMT = parseFloat(grossAftDisc + taxAmt || 0);
 
     // Agar USD hai to rate conversion_rate hoga, agar PKR hai to 1
-    var rate = isPKR ? 1 : parseFloat(invoice.conversion_rate || 1);
+    var rate = isPKR ? 1 : parseFloat(convRate || 1).toFixed(3);
 
 
-    var temp = grossAmt.toLocaleString();
-    if (currCode === "PKR") {
-        temp = parseFloat(invoice.gross_amount || 0);
-    } else {
-        temp = parseFloat(invoice.invoice_amount || 0);
-    }
-
-
-    // "Line Total" column ke liye — YAHAN rate ek hi dafa multiply hoga:
-    //var lineTotal = grossAmountCurr * rate;   // 600 × 290.23 = 174,139.74 (yeh sahi hai, PKR equivalent)
-    var lineTotal = grossAmt;
-
-
-    // total in PKR
-    var discAmountPKR = parseFloat(discAmt);
-    var subTotalPKR = grossAmt - discAmountPKR;   // NOTE: neeche bug bhi fix kar raha hoon
+    //// total in PKR
+    var lineTotal = grossAmt * rate;
+    var discAmountPKR = parseFloat(discAmt * rate);
+    var subTotalPKR = lineTotal - discAmountPKR;   // NOTE: neeche bug bhi fix kar raha hoon
     var taxAmountPKR = parseFloat(subTotalPKR * taxPercent / 100);
-    var finalAmountPKR = grossAmt - discAmountPKR + taxAmountPKR;
+    var finalAmountPKR = parseFloat(lineTotal - discAmountPKR + taxAmountPKR);
 
     // SaaS / No Milestone
     if (milestones.length === 0) {
@@ -146,7 +133,7 @@ function BuildInvoiceHtml(invoice, milestones) {
         rows += `
         <tr>
             <td>MG Link</td>
-            <td class="inv-center">${temp.toLocaleString()}</td>
+            <td class="inv-center">${grossAmt.toLocaleString()}</td>
             <td class="inv-right">${rate}</td>
             <td class="inv-right">${lineTotal.toLocaleString()}</td>
         </tr>
@@ -171,8 +158,6 @@ function BuildInvoiceHtml(invoice, milestones) {
         </tr>
         `;
 
-        //grandTotal = finalAmount; // Final payable amount
-        grandTotal = finalAmountPKR; //final amount in PKR after disc minus and Tax Plus
     }
     else {
         $.each(milestones, function (i, m) {
@@ -216,7 +201,7 @@ function BuildInvoiceHtml(invoice, milestones) {
 
     }
 
-    var amountInWords = ConvertNumberToWords(grandTotal);
+    var amountInWords = ConvertNumberToWords(Math.round(finalAmountPKR));
     console.log(amountInWords);
 
     var currencyLabel = invoice.currency_code || "PKR";
@@ -366,11 +351,8 @@ function BuildInvoiceHtml(invoice, milestones) {
 
             <!-- ================= ITEMS ================= -->
             <div class="inv-items-wrapper">
-
                 <table class="inv-table inv-items">
-
                     <thead>
-
                         ${milestones.length === 0
             ?
             `
@@ -497,8 +479,8 @@ function BuildInvoiceHtml(invoice, milestones) {
                                     TOTAL (PKR)
                                 </td>
 
-                                <td class="amount">
-                                    ${finalAmountPKR.toLocaleString()}
+                                <td class="amount" style="font-size: 18px; font-weight: bold;">
+                                    ${Math.round(finalAmountPKR).toLocaleString()}
                                 </td>
 
                             </tr>
@@ -508,6 +490,15 @@ function BuildInvoiceHtml(invoice, milestones) {
                     </td>
 
                 </tr>
+
+                <tr>
+                    <td colspan="2" class="inv-amount-words-cell" style="padding-top: 6px;">
+                        <div class="inv-amount-words" style="font-size: 12px;">
+                            <strong>Amount in Words:</strong> ${amountInWords} Rupees Only
+                        </div>
+                    </td>
+                </tr>
+
 
             </table>
 

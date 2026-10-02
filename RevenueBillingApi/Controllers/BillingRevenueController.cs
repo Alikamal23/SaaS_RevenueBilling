@@ -2851,6 +2851,58 @@ namespace RevenueBillingApi.Controllers
         }
         #endregion
 
+        #region BR_CancelInvoice
+        [RateLimitMiddleware(50, 5)]
+        [HttpPost]
+        public IActionResult BR_CancelInvoice([FromBody] BR_CancelInvoiceInfo model)
+        {
+            if (model == null || model.invoice_id <= 0)
+            {
+                return BadRequest("Invalid invoice id");
+            }
+
+            DataTable dt;
+            try
+            {
+                NameValueCollection? nv = new NameValueCollection();
+                nv.Add("invoice_id-INT", model.invoice_id.ToString());
+
+                dt = _DAL.GetData("sp_cancel_invoice", nv, _DAL.CSManagementPortalDatabase);
+
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        title = "Validation Error",
+                        message = "Unable to cancel invoice."
+                    });
+                }
+
+                SystemActivityLog(ActivityLog.ActivityID_Update, "Invoice Cancelled via sp_cancel_invoice");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("{0} {1} {2}", "FormsController", MethodBase.GetCurrentMethod().Name, ex.Message);
+                SystemActivityLog(ActivityLog.ActivityID_Error, MethodBase.GetCurrentMethod().Name + " " + ex.Message);
+
+                return BadRequest(new
+                {
+                    status = "error",
+                    title = "Error",
+                    message = ex.Message
+                });
+            }
+
+            return Ok(new
+            {
+                status = "success",
+                data = dt
+            });
+        }
+        #endregion
+
+
         //GetCurrencyRate [conversion rate in Invoice Tab]
         #region GetCurrencyRate 
         [RateLimitMiddleware(100, 5)]
@@ -3291,6 +3343,8 @@ namespace RevenueBillingApi.Controllers
                 nv.Add("Action-VARCHAR", invoice.Action ?? "");
 
                 nv.Add("PONo-NVARCHAR", invoice.PONo?.ToString() ?? "-");
+
+                nv.Add("conv_rate-DECIMAL", invoice.conv_rate?.ToString() ?? "0");
 
                 // ================= MASTER INSERT =================
                 dt = _DAL.GetData("sp_insert_invoiceform", nv, _DAL.CSManagementPortalDatabase);
@@ -3771,7 +3825,6 @@ namespace RevenueBillingApi.Controllers
         }
 
         #endregion
-
 
         #region ConvertRenewalToContract
         [RateLimitMiddleware(50, 5)]

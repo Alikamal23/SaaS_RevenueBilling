@@ -696,6 +696,11 @@ $(document).ready(function () {
         $("#invDiscountPercent").val($(this).data("disc"));
         $("#invTaxPercent").val($(this).data("tax"));
 
+        // Saved Invoice Currency Rate
+        var savedRate = parseFloat($(this).data("rate")) || 0;
+        $("#txtCurrConvRate").val(savedRate.toFixed(6));
+
+
         $("#hdnInvoiceMilestoneNo").val($(this).data("milestone") || "");
         $("#hdnInvoiceBillingPeriod").val($(this).data("billingperiod") || "");
 
@@ -746,7 +751,26 @@ $(document).ready(function () {
 
     $(document).on("input", "#invGrossAmount, #invBaseAmount, #invDiscountPercent, #invTaxPercent", function () {
         calculateInvoiceAmount();
-        SetInvoiceCurrencyConversion();
+
+        //SetInvoiceCurrencyConversion();
+
+        // New Invoice -> Master Currency Rate
+        // Edit Invoice -> Saved Invoice Rate
+        // Only NEW invoice gets currency rate from master
+        if ($("#hdnInvoiceEditMode").val() != "1") {
+            SetInvoiceCurrencyConversion();
+        }
+
+        // EDIT invoice:
+        // saved rate ko use karke PKR amount recalculate karo
+        else {
+            var savedRate = parseFloat($("#txtCurrConvRate").val()) || 0;
+            var invoiceAmount = parseFloat($("#txtInvoiceAmount").val()) || 0;
+            var amountPKR = invoiceAmount * savedRate;
+
+            $("#txtInvoiceAmountPKR").val(amountPKR.toFixed(2));
+        }
+
     });
 
     $("#btnAddNewInvoice").click(function () {
@@ -2316,12 +2340,31 @@ function FillInvoiceForEditManual(clientId, contractId) {
                 // Dates
                 //-----------------------
                 if (invoices.invoice_date)
-                    $("#txtInvoiceDate")
-                        .val(invoices.invoice_date.split('T')[0]);
+                    $("#txtInvoiceDate").val(invoices.invoice_date.split('T')[0]);
 
                 if (invoices.due_date)
-                    $("#txtInvoiceDueDate")
-                        .val(invoices.due_date.split('T')[0]);
+                    $("#txtInvoiceDueDate").val(invoices.due_date.split('T')[0]);
+
+                //if ($("#hdnInvoiceEditMode").val() == "1") {
+                //    $("#txtCurrConvRate").val(parseFloat(invoices.conv_rate).toFixed(6));
+                //}
+
+
+                //-----------------------
+                // Saved Currency Rate
+                //-----------------------
+                if (invoices.conv_rate != null) {
+                    var savedRate = parseFloat(invoices.conv_rate) || 0;
+
+                    $("#txtCurrConvRate").val(savedRate.toFixed(6));
+
+                    // Invoice Amount × SAVED Rate
+                    var invoiceAmount = parseFloat($("#txtInvoiceAmount").val()) || 0;
+                    var amountPKR = invoiceAmount * savedRate;
+
+                    $("#txtInvoiceAmountPKR").val(amountPKR.toFixed(2));
+                }
+
 
             }
         });
@@ -3768,15 +3811,26 @@ function AppendInvoice(formData) {
     formData.append("tax_amount", taxAmt.toFixed(2));
     formData.append("total_amount", totalAmt.toFixed(2));
 
+    ////id	statusname
+    ////1	Pending
+    ////2	Paid
+    ////3	Cancelled
+    ////4	OverDue
+
+    //invoice_status field ...
+
     formData.append("invoice_type", $("#rdoManualInvoice").is(":checked") ? "Manual" : "Auto");
     formData.append("invoice_date", $("#txtInvoiceDate").val());
     formData.append("due_date", $("#txtInvoiceDueDate").val());
-    formData.append("invoice_status", "1");
-    formData.append("payment_status", "0");
+    formData.append("invoice_status", "1");           // 1 for UnPaid or Pending || 2 for Paid  || 3 for Cancelled || 4 for OverDue
+    formData.append("payment_status", "0");           // 0 for UnPaid || 1 for Paid      
     formData.append("remarks", isInvoiceEdit ? "Invoice Amount Updated" : "Manual Generate Invoice");
     formData.append("PONo", $("#txtInvoicePONo").val());
     formData.append("userid", 1);
-    
+
+    //new field conv_rate in invoice save
+    formData.append("conv_rate", $("#txtCurrConvRate").val());
+
 
     var params = new URLSearchParams(window.location.search);
     var type = params.get("type");
@@ -4079,6 +4133,12 @@ function GetInvoiceGrid(client_id = 0, contract_id = 0) {
                             // Invoice Status Badge
                             var invoiceStatus = "";
 
+                            ////id	statusname
+                            ////1	Pending or UnPaid
+                            ////2	Paid
+                            ////3	Cancelled
+                            ////4	OverDue
+
                             switch (option.invoice_status) {
                                 case "Pending":
                                     invoiceStatus = '<span class="badge bg-warning text-dark">Pending</span>';
@@ -4086,11 +4146,11 @@ function GetInvoiceGrid(client_id = 0, contract_id = 0) {
                                 case "Paid":
                                     invoiceStatus = '<span class="badge bg-success">Paid</span>';
                                     break;
-                                case "Over Due":
-                                    invoiceStatus = '<span class="badge bg-danger">Over Due</span>';
-                                    break;
                                 case "Cancelled":
-                                    invoiceStatus = '<span class="badge bg-secondary">Cancelled</span>';
+                                    invoiceStatus = '<span class="badge bg-danger">Cancelled</span>';
+                                    break;
+                                case "Over Due":
+                                    invoiceStatus = '<span class="badge bg-secondary">Over Due</span>';
                                     break;
                                 default:
                                     invoiceStatus = option.invoice_status;
@@ -4107,35 +4167,35 @@ function GetInvoiceGrid(client_id = 0, contract_id = 0) {
                             // Action Buttons
                             var action = '';
 
-                            // Edit — sirf Unpaid invoice pe
-                            if (option.payment_status != "Paid") {
+                            // Edit — sirf jab payment "Paid" na ho AUR invoice "Cancelled" na ho
+                            if (option.payment_status != "Paid" && option.invoice_status != "Cancelled") {
                                 action += '<button type="button" class="btn btn-sm btn-warning EditInvoice me-1" ';
                                 action += 'data-id="' + option.invoice_id + '" ';
                                 action += 'data-no="' + option.invoice_no + '" ';
                                 action += 'data-date="' + option.invoice_date + '" ';
                                 action += 'data-due="' + option.due_date + '" ';
                                 action += 'data-gross="' + (option.gross_amount || 0) + '" ';
+                                action += 'data-rate="' + (option.conv_rate || 0) + '" ';
                                 action += 'data-disc="' + (option.discount_percent || 0) + '" ';
                                 action += 'data-tax="' + (option.tax_percent || 0) + '" ';
                                 action += 'data-milestone="' + (option.milestone_no || '') + '" ';      
                                 action += 'data-billingperiod="' + (option.billing_period || '') + '">';
                                 action += '<i class="fa fa-edit"></i>';
                                 action += '</button>';
-                            } //else { //==Paid
+                            } 
 
-                                action += '<button type"button" class="btn btn-sm btn-info ViewInvoice1 me-1" ';
-                                action += 'data-id="' + invoiceId + '" ';
-                                action += 'data-row="' + i + '">';
-                                action += '<i class="fa fa-eye"></i></button>';
+                            action += '<button type"button" class="btn btn-sm btn-info ViewInvoice1 me-1" ';
+                            action += 'data-id="' + invoiceId + '" ';
+                            action += 'data-row="' + i + '">';
+                            action += '<i class="fa fa-eye"></i></button>';
 
-                                action += '<button type"button" class="btn btn-sm btn-success DownloadInvoice1 me-1" ';
-                                action += 'data-id="' + invoiceId + '">';
-                                action += '<i class="fa fa-download"></i></button>';
+                            action += '<button type"button" class="btn btn-sm btn-success DownloadInvoice1 me-1" ';
+                            action += 'data-id="' + invoiceId + '">';
+                            action += '<i class="fa fa-download"></i></button>';
 
-                                action += '<button type"button" class="btn btn-sm btn-primary EmailInvoice1" ';
-                                action += 'data-id="' + invoiceId + '">';
-                                action += '<i class="fa fa-envelope"></i></button>';
-                            //}
+                            action += '<button type"button" class="btn btn-sm btn-primary EmailInvoice1" ';
+                            action += 'data-id="' + invoiceId + '">';
+                            action += '<i class="fa fa-envelope"></i></button>';
 
                             $("#tblInvDtl").append(
                                 '<tr>' +

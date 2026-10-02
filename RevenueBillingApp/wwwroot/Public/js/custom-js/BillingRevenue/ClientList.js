@@ -19,6 +19,27 @@ $(document).ready(function () {
         }
     });
 
+    $("#inv_table").off("click", ".CancelBtn").on("click", ".CancelBtn", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var invoiceId = $(this).data("id");
+
+        Swal.fire({
+            icon: "warning",
+            title: "Cancel Invoice?",
+            text: "Are you sure you want to cancel this invoice? This action cannot be undone.",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Cancel It",
+            cancelButtonText: "No"
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                CancelInvoice(invoiceId);
+            }
+        });
+    });
+
+
 });
 function ViewGrid() {
     ShowLoader('UserMasterDiv');
@@ -228,6 +249,10 @@ function ViewInvoiceGrid() {
                                 invoiceStatus = '<span class="badge bg-warning">Pending</span>';
                             else if (option.invoice_status_code == 2)
                                 invoiceStatus = '<span class="badge bg-success">Paid</span>';
+                            else if (option.invoice_status_code == 3)
+                                invoiceStatus = '<span class="badge bg-danger">Cancelled</span>';
+                            else if (option.invoice_status_code == 4)
+                                invoiceStatus = '<span class="badge bg-secondary">Over Due</span>';
                             else
                                 invoiceStatus = option.invoice_status;
 
@@ -258,6 +283,17 @@ function ViewInvoiceGrid() {
                                 'type="button">' +
                                 '<i class="feather-mail"></i>' +
                                 '</button>';
+
+                            // NAYA: Cancel button — sirf tab show ho jab invoice Paid ya already Cancelled na ho
+                            if (option.payment_status != "Paid" && option.invoice_status_code != 3) {
+                                action += '<button class="avatar-text avatar-md CancelBtn" ' +
+                                    'data-id="' + option.invoice_id + '" ' +
+                                    'type="button" title="Cancel Invoice">' +
+                                    '<i class="feather-x-circle"></i>' +
+                                    '</button>';
+                            }
+
+
 
                             $('#inv_table tbody').append(
                                 '<tr>' +
@@ -329,4 +365,40 @@ function ViewInvoiceGrid() {
 
     });
 
+}
+
+function CancelInvoice(invoiceId) {
+    ShowLoader('UserMasterDiv');
+
+    UTILITY.CheckSession((data_) => {
+        if (data_) {
+
+            new APICALL(GetGlobalURL('Base', 'BR_CancelInvoice'), 'POST', JSON.stringify({ invoice_id: invoiceId }), true)
+                .FETCH((result, error) => {
+
+                    HideLoader("UserMasterDiv");
+
+                    if (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error...',
+                            text: error.data.responseText
+                        });
+                        return;
+                    }
+
+                    if (result) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cancelled',
+                            text: 'Invoice has been cancelled successfully.'
+                        });
+
+                        ViewInvoiceGrid(); // grid refresh
+                    }
+
+                });
+
+        }
+    });
 }

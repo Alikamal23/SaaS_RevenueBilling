@@ -15,6 +15,7 @@ using RevenueBillingApp.Middleware;
 using System.Security.Cryptography;
 using RevenueBillingApp.Models.BillingRevenue;
 using System.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RevenueBillingApp.Controllers
 {
@@ -3194,6 +3195,19 @@ namespace RevenueBillingApp.Controllers
             UserInfo _info = _requestClient.GetUserInformation();
 
             HttpResponseMessage response = _requestClient.UseHttpClientGet(null, "LoadMaxInvoiceID", "BillingRevenue");
+            return new HttpResponseMessageResult(response);
+        }
+        #endregion
+
+        #region BR_CancelInvoice
+        [HttpPost]
+        [TypeFilter(typeof(AllowedApiAccess))]
+        public IActionResult BR_CancelInvoice([FromBody] BR_CancelInvoiceInfo model)
+        {
+            UserInfo _info = _requestClient.GetUserInformation();
+
+            string jsonString = JsonConvert.SerializeObject(model);
+            HttpResponseMessage response = _requestClient.UseHttpClientPost(jsonString, "BR_CancelInvoice", "BillingRevenue");
             return new HttpResponseMessageResult(response);
         }
         #endregion
