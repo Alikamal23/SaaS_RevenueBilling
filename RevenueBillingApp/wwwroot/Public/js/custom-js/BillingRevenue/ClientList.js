@@ -366,7 +366,6 @@ function ViewInvoiceGrid() {
     });
 
 }
-
 function CancelInvoice(invoiceId) {
     ShowLoader('UserMasterDiv');
 
