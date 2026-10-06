@@ -118,6 +118,15 @@ function BuildInvoiceHtml(invoice, milestones) {
     // Agar USD hai to rate conversion_rate hoga, agar PKR hai to 1
     var rate = isPKR ? 1 : parseFloat(convRate || 1).toFixed(3);
 
+    var invoice_status = parseInt(invoice.invoice_status || 0);
+    ////alert(invoice_status);
+
+    // NAYA FIX: invoice_status string ("Cancelled") ya numeric (3) dono ho sakta hai
+    var isCancelled = (invoice_status == 3);
+
+    // NAYA: Paid check (string "Paid" ya numeric 2)
+    var isPaid = (invoice_status == 2);
+
 
     //// total in PKR
     var lineTotal = grossAmt * rate;
@@ -222,9 +231,50 @@ function BuildInvoiceHtml(invoice, milestones) {
 
                 <tr>
                     <!-- CLIENT -->
-                    <td class="inv-header-left">
+                    <td class="inv-header-left" style="position: relative;">
                         <div class="inv-company-name">
-                            
+
+                            ${isCancelled ? `
+                            <div style="
+                                position: absolute;
+                                top: 40%;
+                                left: 50%;
+                                transform: translate(-50%, -50%) rotate(-30deg);
+                                font-size: 36px;
+                                font-weight: bold;
+                                color: rgba(220, 0, 0, 0.35);
+                                border: 4px solid rgba(220, 0, 0, 0.35);
+                                padding: 6px 20px;
+                                letter-spacing: 4px;
+                                white-space: nowrap;
+                                pointer-events: none;
+                                text-transform: uppercase;
+                            ">
+                                CANCELLED
+                            </div>
+                            ` : ``}
+
+                            ${isPaid ? `
+                            <div style="
+                                position: absolute;
+                                top: 40%;
+                                left: 50%;
+                                transform: translate(-50%, -50%) rotate(-30deg);
+                                font-size: 36px;
+                                font-weight: bold;
+                                color: rgba(0, 150, 0, 0.35);
+                                border: 4px solid rgba(0, 150, 0, 0.35);
+                                padding: 6px 20px;
+                                letter-spacing: 4px;
+                                white-space: nowrap;
+                                pointer-events: none;
+                                text-transform: uppercase;
+                            ">
+                                PAID
+                            </div>
+                            ` : ``}
+
+
                         </div>
                     </td>
 

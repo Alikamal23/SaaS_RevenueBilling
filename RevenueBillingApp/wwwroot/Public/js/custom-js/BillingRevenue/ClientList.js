@@ -40,6 +40,27 @@ $(document).ready(function () {
     });
 
 
+    $("#inv_table").off("click", ".DeleteBtn").on("click", ".DeleteBtn", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var invoiceId = $(this).data("id");
+
+        Swal.fire({
+            icon: "warning",
+            title: "Delete Invoice?",
+            text: "Are you sure you want to delete this invoice? This action cannot be undone.",
+            showCancelButton: true,
+            confirmButtonText: "Yes, Delete It",
+            cancelButtonText: "No"
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                DeleteInvoice(invoiceId);
+            }
+        });
+    });
+
+
 });
 function ViewGrid() {
     ShowLoader('UserMasterDiv');
@@ -272,17 +293,19 @@ function ViewInvoiceGrid() {
                                 '<i class="feather-eye"></i>' +
                                 '</button>';
 
-                            action += '<button class="avatar-text avatar-md DownloadBtn" ' +
-                                'data-id="' + option.invoice_id + '" ' +
-                                'type="button">' +
-                                '<i class="feather-download"></i>' +
-                                '</button>';
+                            if (option.invoice_status_code !== 3) {
+                                action += '<button class="avatar-text avatar-md DownloadBtn" ' +
+                                    'data-id="' + option.invoice_id + '" ' +
+                                    'type="button">' +
+                                    '<i class="feather-download"></i>' +
+                                    '</button>';
 
-                            action += '<button class="avatar-text avatar-md EmailBtn" ' +
-                                'data-id="' + option.invoice_id + '" ' +
-                                'type="button">' +
-                                '<i class="feather-mail"></i>' +
-                                '</button>';
+                                action += '<button class="avatar-text avatar-md EmailBtn" ' +
+                                    'data-id="' + option.invoice_id + '" ' +
+                                    'type="button">' +
+                                    '<i class="feather-mail"></i>' +
+                                    '</button>';
+                            }
 
                             // NAYA: Cancel button — sirf tab show ho jab invoice Paid ya already Cancelled na ho
                             if (option.payment_status != "Paid" && option.invoice_status_code != 3) {
@@ -291,8 +314,15 @@ function ViewInvoiceGrid() {
                                     'type="button" title="Cancel Invoice">' +
                                     '<i class="feather-x-circle"></i>' +
                                     '</button>';
-                            }
 
+                                action += '<button class="avatar-text avatar-md DeleteBtn" ' +
+                                    'data-id="' + option.invoice_id + '" ' +
+                                    'type="button" title="Delete Invoice">' +
+                                    '<i class="feather-trash-2"></i>' +
+                                    '</button>';
+
+
+                            }
 
 
                             $('#inv_table tbody').append(
@@ -391,6 +421,41 @@ function CancelInvoice(invoiceId) {
                             icon: 'success',
                             title: 'Cancelled',
                             text: 'Invoice has been cancelled successfully.'
+                        });
+
+                        ViewInvoiceGrid(); // grid refresh
+                    }
+
+                });
+
+        }
+    });
+}
+function DeleteInvoice(invoiceId) {
+    ShowLoader('UserMasterDiv');
+
+    UTILITY.CheckSession((data_) => {
+        if (data_) {
+
+            new APICALL(GetGlobalURL('Base', 'BR_DeleteInvoice'), 'POST', JSON.stringify({ invoice_id: invoiceId }), true)
+                .FETCH((result, error) => {
+
+                    HideLoader("UserMasterDiv");
+
+                    if (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error...',
+                            text: error.data.responseText
+                        });
+                        return;
+                    }
+
+                    if (result) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Deleted',
+                            text: 'Invoice has been deleted successfully.'
                         });
 
                         ViewInvoiceGrid(); // grid refresh

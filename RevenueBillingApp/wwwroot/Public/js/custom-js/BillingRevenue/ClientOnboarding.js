@@ -354,6 +354,22 @@ $(document).ready(function () {
     toggleClient();
     toggleContractType();
     toggleAutoManualInvoice();
+    toggleInvoiceNoType();   // initial state set karne ke liye
+
+    $("input[name='rdInvoiceNoType']").change(function () {
+        toggleInvoiceNoType();
+    });
+
+    // Jab dropdown se koi invoice_no select ho, uski id ko hidden field mein rakh lein
+    // (save time pe ye id @reused_invoice_id ke taur pe backend ko jayegi)
+    $(document).on("change", "#ddlExistingInvoiceNo", function () {
+        var selectedInvoiceId = $(this).val();
+        var selectedInvoiceNo = $(this).find("option:selected").text();
+
+        // hidden field mein store (naya hidden input add karna hoga HTML mein)
+        $("#hdnReusedInvoiceId").val(selectedInvoiceId);
+    });
+
 
     $("input[name='new_existing']").change(function () {
         toggleClient();
@@ -787,6 +803,10 @@ $(document).ready(function () {
         //new function()
         SetInvoiceCurrencyConversion();
 
+        // NAYA: Radio ko default "New Invoice No" pe reset karo aur view update karo
+        $("#rdNewInvoiceNo").prop("checked", true);
+        toggleInvoiceNoType();
+
     });
 
     //++******* start Preview Document on Modal Form
@@ -1147,6 +1167,25 @@ function toggleContractType() {
         $("#total_saas_amount").prop("disabled", true);
         $("#final_amount").prop("disabled", true);
 
+    }
+}
+function toggleInvoiceNoType() {
+    if ($("#rdExistingInvoiceNo").is(":checked")) {
+        // Dropdown dikhao, textbox chupao
+        $("#txtInvoiceNo").addClass("d-none");
+        $("#ddlExistingInvoiceNo").removeClass("d-none");
+
+        // Dropdown load karo (reusable deleted invoice numbers)
+        LoadReusableInvoiceNos();
+    }
+    else if ($("#rdNewInvoiceNo").is(":checked")) {
+        // Textbox dikhao, dropdown chupao
+        $("#ddlExistingInvoiceNo").addClass("d-none");
+        $("#txtInvoiceNo").removeClass("d-none");
+
+        // Reset hidden field aur dropdown selection
+        $("#hdnReusedInvoiceId").val("");
+        $("#ddlExistingInvoiceNo").val("");
     }
 }
 function InitPaymentGridEvents() {
@@ -3765,7 +3804,25 @@ function AppendInvoice(formData) {
     formData.append("workflow", "COB");
     formData.append("instanceid", 0);
     formData.append("invoice_id", invoiceId);
-    formData.append("invoice_no", $("#txtInvoiceNo").val() || "");
+
+
+    //formData.append("invoice_no", $("#txtInvoiceNo").val() || "");
+
+    // ============================
+    // NAYA: Invoice No — New ya Existing (Reused)
+    // ============================
+    var invoiceNoType = $("input[name='rdInvoiceNoType']:checked").val();
+
+    if (invoiceNoType === "existing") {
+        var selectedInvoiceNo = $("#ddlExistingInvoiceNo option:selected").text();
+        formData.append("invoice_no", selectedInvoiceNo || "");
+        formData.append("reused_invoice_id", $("#hdnReusedInvoiceId").val() || 0);
+    } else {
+        formData.append("invoice_no", $("#txtInvoiceNo").val() || "");
+        formData.append("reused_invoice_id", 0);
+    }
+
+
     formData.append("client_id", $("#hdnClientId").val() || 0);
     formData.append("contract_id", $("#hdnContractId").val() || 0);
 
@@ -4650,6 +4707,32 @@ function GetClientInfoDDL() {
             });
         }
 
+    });
+}
+function LoadReusableInvoiceNos() {
+    new APICALL(GetGlobalURL('Base', 'GetReusableInvoiceNos'), 'GET', '', true).FETCH((result, error) => {
+
+        if (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error...',
+                text: error.data.responseText,
+                footer: ''
+            });
+            return;
+        }
+
+        if (result && result.data) {
+            $("#ddlExistingInvoiceNo").html('<option value="">-- Select Invoice No --</option>');
+
+            $.each(result.data, function (i, item) {
+                $("#ddlExistingInvoiceNo").append(
+                    '<option value="' + item.invoice_id + '">' + item.invoice_no + '</option>'
+                );
+            });
+        }
+
+        
     });
 }
 

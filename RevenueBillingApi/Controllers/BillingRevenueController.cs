@@ -2769,6 +2769,34 @@ namespace RevenueBillingApi.Controllers
 
         #endregion
 
+        #region FillExistingDeletedInvoiceNos
+        [RateLimitMiddleware(100, 5)]
+        [HttpGet]
+        public IActionResult GetReusableInvoiceNos()
+        {
+            DataTable dt = new DataTable();
+            try
+            {
+                NameValueCollection nv = new NameValueCollection();
+                //nv.Add("CategoryCode-INT", CategoryCode);
+                dt = _DAL.GetData("sp_get_reusable_invoices", nv, _DAL.CSManagementPortalDatabase);
+
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    SystemActivityLog(ActivityLog.ActivityID_Get, ActivityLog.ActivityDetails_Get + "sp_get_reusable_invoices");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("{0} {1} {2}", "BillingRevenueController", MethodBase.GetCurrentMethod().Name, ex.Message);
+                SystemActivityLog(ActivityLog.ActivityID_Error, MethodBase.GetCurrentMethod().Name + " " + ex.Message);
+                BadRequest(ex.Message);
+            }
+            return Ok(dt);
+        }
+
+        #endregion
+
 
         #region LoadMaxClientID
         [RateLimitMiddleware(100, 5)]
@@ -2880,6 +2908,57 @@ namespace RevenueBillingApi.Controllers
                 }
 
                 SystemActivityLog(ActivityLog.ActivityID_Update, "Invoice Cancelled via sp_cancel_invoice");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("{0} {1} {2}", "FormsController", MethodBase.GetCurrentMethod().Name, ex.Message);
+                SystemActivityLog(ActivityLog.ActivityID_Error, MethodBase.GetCurrentMethod().Name + " " + ex.Message);
+
+                return BadRequest(new
+                {
+                    status = "error",
+                    title = "Error",
+                    message = ex.Message
+                });
+            }
+
+            return Ok(new
+            {
+                status = "success",
+                data = dt
+            });
+        }
+        #endregion
+
+        #region BR_DeleteInvoice
+        [RateLimitMiddleware(50, 5)]
+        [HttpPost]
+        public IActionResult BR_DeleteInvoice([FromBody] BR_CancelInvoiceInfo model)
+        {
+            if (model == null || model.invoice_id <= 0)
+            {
+                return BadRequest("Invalid invoice id");
+            }
+
+            DataTable dt;
+            try
+            {
+                NameValueCollection? nv = new NameValueCollection();
+                nv.Add("invoice_id-INT", model.invoice_id.ToString());
+
+                dt = _DAL.GetData("sp_delete_invoice", nv, _DAL.CSManagementPortalDatabase);
+
+                if (dt == null || dt.Rows.Count == 0)
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        title = "Validation Error",
+                        message = "Unable to delete invoice."
+                    });
+                }
+
+                SystemActivityLog(ActivityLog.ActivityID_Update, "Invoice Deleted via sp_delete_invoice");
             }
             catch (Exception ex)
             {
@@ -3345,6 +3424,13 @@ namespace RevenueBillingApi.Controllers
                 nv.Add("PONo-NVARCHAR", invoice.PONo?.ToString() ?? "-");
 
                 nv.Add("conv_rate-DECIMAL", invoice.conv_rate?.ToString() ?? "0");
+
+                // NAYA: reused_invoice_id (0 ya null ho to NULL bhejo)
+                nv.Add("reused_invoice_id-INT",
+                    (invoice.reused_invoice_id.HasValue && invoice.reused_invoice_id.Value > 0)
+                    ? invoice.reused_invoice_id.Value.ToString()
+                    : "NULL");
+
 
                 // ================= MASTER INSERT =================
                 dt = _DAL.GetData("sp_insert_invoiceform", nv, _DAL.CSManagementPortalDatabase);
@@ -4058,7 +4144,6 @@ namespace RevenueBillingApi.Controllers
 
         #endregion
 
-        //EmailTemplate
         #region EmailTemplate
 
         [RateLimitMiddleware(50, 5)]

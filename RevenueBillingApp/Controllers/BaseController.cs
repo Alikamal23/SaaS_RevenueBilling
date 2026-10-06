@@ -2406,6 +2406,15 @@ namespace RevenueBillingApp.Controllers
             return new HttpResponseMessageResult(response);
         }
 
+        [HttpGet]
+        [TypeFilter(typeof(AllowedApiAccess))]
+        public IActionResult GetReusableInvoiceNos()
+        {
+            UserInfo _info = _requestClient.GetUserInformation();
+
+            HttpResponseMessage response = _requestClient.UseHttpClientGet(null, "GetReusableInvoiceNos", "BillingRevenue");
+            return new HttpResponseMessageResult(response);
+        }
 
         #endregion
 
@@ -3212,6 +3221,19 @@ namespace RevenueBillingApp.Controllers
         }
         #endregion
 
+        #region BR_DeleteInvoice
+        [HttpPost]
+        [TypeFilter(typeof(AllowedApiAccess))]
+        public IActionResult BR_DeleteInvoice([FromBody] BR_CancelInvoiceInfo model)
+        {
+            UserInfo _info = _requestClient.GetUserInformation();
+
+            string jsonString = JsonConvert.SerializeObject(model);
+            HttpResponseMessage response = _requestClient.UseHttpClientPost(jsonString, "BR_DeleteInvoice", "BillingRevenue");
+            return new HttpResponseMessageResult(response);
+        }
+        #endregion
+
 
         //GetCurrencyRate [conversion rate in Invoice Tab]
         #region GetCurrencyRate
@@ -3854,8 +3876,6 @@ namespace RevenueBillingApp.Controllers
         }
         #endregion
 
-
-        //Invoice Grid
         #region GetAllInvoicesGrid
         [HttpGet]
         [TypeFilter(typeof(AllowedApiAccess))]

@@ -239,6 +239,7 @@
         public string? EditID { get; set; }
         public string? InvitationToken { get; set; }
 
+        public int? reused_invoice_id { get; set; }
 
         //// ✅ Detail List
         ////public List<InvoiceDetailForm> invoice_details { get; set; }
