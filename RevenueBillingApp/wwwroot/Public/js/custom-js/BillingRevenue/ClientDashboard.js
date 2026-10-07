@@ -239,10 +239,26 @@ function LoadClientDashboard(clientId) {
                 .show();
 
 
-            $("[data-kpi='total-ar']").text(FormatAmount(d.Table[0].total_ar, false));
-            $("[data-kpi='active-contracts']").text(d.Table[0].active_contracts_count);
-            $("[data-kpi='pending-milestones']").text(d.Table[0].pending_milestones_count);
-            $("[data-kpi='current-balance']").text(FormatAmount(d.Table[0].current_balance, false));
+            //$("[data-kpi='total-ar']").text(FormatAmount(d.Table[0].total_ar, false));
+            //$("[data-kpi='active-contracts']").text(d.Table[0].active_contracts_count);
+            //$("[data-kpi='pending-milestones']").text(d.Table[0].pending_milestones_count);
+            //$("[data-kpi='current-balance']").text(FormatAmount(d.Table[0].current_balance, false));
+
+            $("[data-kpi='total-ar']").text(
+                FormatAmount(d.Table5[0].total_ar, false)
+            );
+
+            $("[data-kpi='active-contracts']").text(
+                d.Table5[0].active_contracts_count
+            );
+
+            $("[data-kpi='pending-milestones']").text(
+                d.Table5[0].pending_milestones_count
+            );
+
+            $("[data-kpi='current-balance']").text(
+                FormatAmount(d.Table5[0].current_balance, false)
+            );
 
 
             $("#primary_contact_name").html(d.Table[0].primary_contact_name);
