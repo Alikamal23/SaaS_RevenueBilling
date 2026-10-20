@@ -26,6 +26,7 @@ namespace RevenueBillingApp.Utility
                 context.RejectPrincipal();
                 await context.HttpContext.SignOutAsync("ASPXAUTH");
                 _sessions.RemoveSession(UniqueKey, UserID);
+                return;
             }
         }
     }

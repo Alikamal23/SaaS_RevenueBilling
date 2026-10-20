@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using RevenueBillingApp.Utility;
 using System.Text;
 
 namespace RevenueBillingApp.Controllers
 {
+
+    [Authorize(AuthenticationSchemes = "ASPXAUTH")]
+    [TypeFilter(typeof(AuthenticationAccess))]
     public class BillingRevenueController : Controller
     {
         private readonly IConfiguration _configuration;
@@ -12,11 +17,11 @@ namespace RevenueBillingApp.Controllers
             _configuration = configuration;
         }
 
-
         public IActionResult ClientOnboarding()
         {
             return View();
         }
+
         public IActionResult ClientList()
         {
             return View();
@@ -80,8 +85,6 @@ namespace RevenueBillingApp.Controllers
             }
         }
 
-        //NextUnpaidInvoiceDue
-
         public IActionResult NextUnpaidInvoiceDue()
         {
             return View();
@@ -92,7 +95,6 @@ namespace RevenueBillingApp.Controllers
         {
             return View();
         }
-
 
         //Reports .....
         #region Reports Menu
