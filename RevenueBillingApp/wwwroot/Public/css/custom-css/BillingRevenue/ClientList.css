@@ -1067,9 +1067,9 @@ span.select2-container.select2-container--default.select2-container--open {
     border: 1px solid #d6d8db;
 }
 
-#user-master {
+/*#user-master {
     width: 100% !important;
-}
+}*/
 
 /* Client Onboarding Progress */
 .progress-title {
@@ -1120,4 +1120,148 @@ span.select2-container.select2-container--default.select2-container--open {
 /* Client List - Client Name Left Align */
 #user-master tbody td.client-name {
     text-align: left !important;
+}
+
+
+
+
+
+/* =====================================================
+   COMPACT TABLES + SCROLL (Client List & Invoice List)
+===================================================== */
+
+/* DataTables scrollX ka apna wrapper hai, bootstrap table-responsive ka double scrollbar hatao */
+#pills-tabContent .table-responsive {
+    overflow: visible;
+}
+
+/* ---- Header ---- */
+#user-master thead th,
+#inv_table thead th,
+#pills-tabContent .dataTables_scrollHead th {
+    padding: 6px 8px !important;
+    font-size: 12px;
+    line-height: 1.2;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+/* ---- Body cells ---- */
+#user-master tbody td,
+#inv_table tbody td {
+    padding: 3px 8px !important;
+    font-size: 12px;
+    line-height: 1.25;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+    /* Client name: wrap ho sake + left align (existing rule ke saath compatible) */
+    #user-master tbody td.client-name {
+        white-space: normal;
+        min-width: 180px;
+        text-align: left !important;
+    }
+
+    /* ---- Action buttons: ek line + chhote ---- */
+    #user-master tbody td:last-child,
+    #inv_table tbody td:last-child {
+        white-space: nowrap;
+    }
+
+#user-master .avatar-text,
+#inv_table .avatar-text {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    margin: 0 2px 0 0;
+    vertical-align: middle;
+}
+
+    /* existing ".btn i, button i {font-size:16px !important}" ko override karne ke liye !important zaroori hai */
+    #user-master .avatar-text i,
+    #inv_table .avatar-text i {
+        font-size: 13px !important;
+    }
+
+/* ---- Client List progress bar compact ---- */
+#user-master .progress-title {
+    font-size: 10px;
+    margin-bottom: 2px;
+    line-height: 1.1;
+}
+
+#user-master .client-progress {
+    width: 120px;
+    height: 10px;
+    margin: 0 auto;
+}
+
+    #user-master .client-progress .progress-bar {
+        line-height: 10px;
+        font-size: 8px;
+    }
+
+#user-master .progress-status {
+    font-size: 10px;
+    margin-top: 1px;
+    line-height: 1.1;
+}
+
+/* ---- Invoice badges ---- */
+#inv_table .badge {
+    font-size: 10px;
+    padding: 3px 6px;
+}
+
+/* ---- DataTables scroll body: scrollbar hamesha visible area mein ---- */
+#pills-tabContent .dataTables_scrollBody {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+    /* Alternate row color jo aapne global set kiya hai wo scroll tables mein bhi chale */
+    #pills-tabContent .dataTables_scrollBody tbody tr:nth-child(even) {
+        background-color: #f1f3f6;
+    }
+
+
+/* =====================================================
+   COMPACT HEADERS (Client List & Invoice List)
+===================================================== */
+
+/* Header cells: scrollX wale cloned header + normal header dono */
+#pills-tabContent .dataTables_scrollHead table thead th,
+#pills-tabContent .dataTables_scrollHeadInner table thead th,
+#user-master thead th,
+#inv_table thead th {
+    font-family: Montserrat, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    padding: 6px 18px 6px 6px !important; /* right padding sort arrow ke liye */
+    white-space: normal !important; /* lamba naam 2 line mein wrap ho jaye */
+    text-align: center;
+    vertical-align: middle;
+    color: #283c50;
+}
+
+/* Sort arrows chhote aur header text ke upar na chadhein */
+#pills-tabContent table.dataTable thead .sorting:before,
+#pills-tabContent table.dataTable thead .sorting:after,
+#pills-tabContent table.dataTable thead .sorting_asc:before,
+#pills-tabContent table.dataTable thead .sorting_asc:after,
+#pills-tabContent table.dataTable thead .sorting_desc:before,
+#pills-tabContent table.dataTable thead .sorting_desc:after {
+    font-size: 9px;
+    right: 4px;
+}
+
+/* Body ka font bhi header ke saath match */
+#user-master tbody td,
+#inv_table tbody td {
+    font-family: Montserrat, sans-serif;
+    font-size: 12px;
 }

@@ -9,6 +9,9 @@ $(document).ready(function () {
 
         var target = $(e.target).attr("id");
 
+        // NAYA: hidden tab ke columns sahi align karne ke liye
+        $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+
         if (target === "pills-all-tab") {
             $("#pageTitle").text("Client List");
             $("#pageDescription").text("Create the client record + define contract basics");
@@ -185,10 +188,20 @@ function ViewGrid() {
                         });
 
                     }
+                    //$('#user-master').DataTable({
+                    //    autoWidth: false,
+                    //    responsive: true
+                    //});
+
                     $('#user-master').DataTable({
                         autoWidth: false,
-                        responsive: true
+                        scrollX: true,                       // horizontal scroll
+                        scrollY: GetTableScrollHeight(),     // vertical scroll, header fixed rahega
+                        scrollCollapse: true,
+                        pageLength: 25,
+                        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
                     });
+
                     HideLoader('UserMasterDiv');
                 }
                 if (error) {
@@ -240,6 +253,8 @@ function ViewInvoiceGrid() {
                         $("#inv_table tbody").html("");
 
                         $.each(result.data, function (i, option) {
+                            var sno = i + 1;   // 1, 2, 3, 4...
+
                             // Invoice Date
                             var invoiceDate = "";
                             if (option.invoice_date) {
@@ -327,6 +342,7 @@ function ViewInvoiceGrid() {
 
                             $('#inv_table tbody').append(
                                 '<tr>' +
+                                    '<td>' + sno + '</td>' +
                                     '<td>' + (option.invoice_no || '') + '</td>' +
                                     '<td>' + (option.client_name || '') + '</td>' +
                                     '<td>' + (option.contract_refno || '') + '</td>' +
@@ -347,9 +363,19 @@ function ViewInvoiceGrid() {
 
                         });
 
+                        //$("#inv_table").DataTable({
+                        //    autoWidth: false,
+                        //    responsive: true,
+                        //    order: [[0, "desc"]]
+                        //});
+
                         $("#inv_table").DataTable({
                             autoWidth: false,
-                            responsive: true,
+                            scrollX: true,
+                            scrollY: GetTableScrollHeight(),
+                            scrollCollapse: true,
+                            pageLength: 25,
+                            lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
                             order: [[0, "desc"]]
                         });
 
@@ -466,3 +492,9 @@ function DeleteInvoice(invoiceId) {
         }
     });
 }
+
+function GetTableScrollHeight() {
+    // 360 = header + tabs + search + pagination ki approx height, zarurat ho to adjust karein
+    return ($(window).height() - 360) + 'px';
+}
+

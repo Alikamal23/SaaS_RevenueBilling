@@ -45,3 +45,145 @@ body {
         transform: rotate(360deg);
     }
 }
+
+/* =====================================================
+   COMPACT HEADERS (Client List & Invoice List)
+===================================================== */
+
+/* Header cells: scrollX wale cloned header + normal header dono */
+#pills-tabContent .dataTables_scrollHead table thead th,
+#pills-tabContent .dataTables_scrollHeadInner table thead th,
+#user-master thead th,
+#inv_table thead th {
+    font-family: Montserrat, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    padding: 6px 18px 6px 6px !important; /* right padding sort arrow ke liye */
+    white-space: normal !important; /* lamba naam 2 line mein wrap ho jaye */
+    text-align: center;
+    vertical-align: middle;
+    color: #283c50;
+}
+
+/* Sort arrows chhote aur header text ke upar na chadhein */
+#pills-tabContent table.dataTable thead .sorting:before,
+#pills-tabContent table.dataTable thead .sorting:after,
+#pills-tabContent table.dataTable thead .sorting_asc:before,
+#pills-tabContent table.dataTable thead .sorting_asc:after,
+#pills-tabContent table.dataTable thead .sorting_desc:before,
+#pills-tabContent table.dataTable thead .sorting_desc:after {
+    font-size: 9px;
+    right: 4px;
+}
+
+/* Body ka font bhi header ke saath match */
+#user-master tbody td,
+#inv_table tbody td {
+    font-family: Montserrat, sans-serif;
+    font-size: 12px;
+}
+
+/* =====================================================
+   DATATABLES - SAME LOOK AS CLIENT LIST (all pages)
+===================================================== */
+
+/* Top row: Show entries + Search */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_filter label {
+    font-family: Montserrat, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    color: #000 !important; /* grey nahi, Client List jaisa dark */
+}
+
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        font-size: 12px !important;
+        height: 32px !important;
+        padding: 4px 12px !important;
+    }
+
+/* Footer: Showing 1 to 5 of 5 entries */
+.dataTables_wrapper .dataTables_info {
+    font-family: Montserrat, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    color: #000 !important;
+    padding-top: 0 !important;
+}
+
+/* Pagination */
+.dataTables_wrapper .dataTables_paginate .paginate_button,
+.dataTables_wrapper .dataTables_paginate .page-link {
+    font-family: Montserrat, sans-serif !important;
+    font-size: 11px !important;
+    padding: 5px 12px !important;
+    line-height: 1.4;
+}
+
+/* Top aur bottom row ka spacing (Client List wala: 5px 25px) */
+.dataTables_wrapper .row:first-child,
+.dataTables_wrapper .row:last-child {
+    padding: 8px 25px !important;
+    align-items: center;
+    margin: 0 !important;
+}
+
+/* Table card ke andar rahe (Currency par bahar nikal raha tha) */
+.dataTables_wrapper {
+    padding: 0;
+    overflow: hidden;
+}
+
+    /* ---- Header (same as Client List) ---- */
+    .dataTables_wrapper table.dataTable thead th {
+        font-family: Montserrat, sans-serif !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        line-height: 1.2 !important;
+        padding: 6px 18px 6px 6px !important;
+        color: #283c50;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    /* ---- Body rows compact (Currency ke 47px rows ko 42px jaisa) ---- */
+    .dataTables_wrapper table.dataTable tbody td {
+        font-family: Montserrat, sans-serif;
+        font-size: 12px;
+        padding: 3px 8px !important;
+        line-height: 1.25;
+        vertical-align: middle;
+    }
+
+    /* Edit / Delete / action icons chhote */
+    .dataTables_wrapper table.dataTable tbody .avatar-text {
+        width: 26px !important;
+        height: 26px !important;
+        min-width: 26px;
+    }
+
+        .dataTables_wrapper table.dataTable tbody .avatar-text i {
+            font-size: 13px !important;
+        }
+
+    /* Badges (Active / Base Currency) */
+    .dataTables_wrapper table.dataTable tbody .badge {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+
+    /* Sort arrows */
+    .dataTables_wrapper table.dataTable thead .sorting:before,
+    .dataTables_wrapper table.dataTable thead .sorting:after,
+    .dataTables_wrapper table.dataTable thead .sorting_asc:before,
+    .dataTables_wrapper table.dataTable thead .sorting_asc:after,
+    .dataTables_wrapper table.dataTable thead .sorting_desc:before,
+    .dataTables_wrapper table.dataTable thead .sorting_desc:after {
+        font-size: 9px;
+        right: 4px;
+    }
+
