@@ -22,6 +22,7 @@ namespace RevenueBillingApp.Middleware
             _logger = logger;
             _httpContext = httpContextAccessor.HttpContext;
         }
+
         #region Get Session
 
         private SessionItems GetSessionItems(HttpContext httpContext)

@@ -52,8 +52,8 @@ namespace RevenueBillingApp.Middleware
                 "script-src-elem 'self';" +
                 "style-src 'self' 'unsafe-inline';" +
                 "style-src-attr 'self' 'unsafe-inline' https://fonts.googleapis.com;" +
-"style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com;"+
-            "upgrade-insecure-requests;" +
+                "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com;"+
+                "upgrade-insecure-requests;" +
                 "worker-src 'self';"
                 ));
             context.Response.Headers.Add("referrer-policy", new StringValues("strict-origin-when-cross-origin"));
