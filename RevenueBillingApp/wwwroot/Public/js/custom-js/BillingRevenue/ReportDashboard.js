@@ -164,9 +164,6 @@ $(document).ready(function () {
     });
 
 
-
-
-
 });
 
 function LoadReportParameters(reportType) {
@@ -181,25 +178,37 @@ function LoadReportParameters(reportType) {
         .remove();
 
     if (reportType === "ClientList") {
-
         html = GetClientListParameterHtml();
-
     }
     else {
-        console.log("Other Report");
-
         html = GetClientOnlyParameterHtml();
     }
 
     $("#reportParameters").html(html);
 
-    if (reportType === "ClientList") {
-        FillIndustryDropdown("#ddlReportIndustry");
+    //if (reportType === "ClientList") {
+    //    FillIndustryDropdown("#ddlReportIndustry");
 
+    //}
+    //else {
+    //    FillClientDropdown("#ddlReportClient");
+    //}
+
+    if (reportType === "ClientList") {
+
+        // Data available ho to immediately fill karein.
+        if (window.industryDDLData) {
+            FillIndustryDropdown("#ddlReportIndustry");
+        }
+
+    } else {
+
+        if (window.clientDDLData) {
+            FillClientDropdown("#ddlReportClient");
+        }
     }
-    else {
-        FillClientDropdown("#ddlReportClient");
-    }
+
+
 }
 
 function GetClientListParameterHtml() {
@@ -359,8 +368,26 @@ function FillClientDropdown(selector) {
 }
 
 
-function GetIndustryDDL() {
+//function GetIndustryDDL() {
 
+//    new APICALL(
+//        GetGlobalURL('Base', 'GetIndustryDDL'),
+//        'GET',
+//        '',
+//        true
+//    ).FETCH((result, error) => {
+//        if (error)
+//            return;
+
+//        if (result.data != null) {
+//            window.industryDDLData = result.data;
+//        }
+
+//    });
+
+//}
+
+function GetIndustryDDL() {
     new APICALL(
         GetGlobalURL('Base', 'GetIndustryDDL'),
         'GET',
@@ -368,44 +395,107 @@ function GetIndustryDDL() {
         true
     ).FETCH((result, error) => {
 
-        if (error)
+        if (error) {
+            console.error("GetIndustryDDL Error:", error);
             return;
+        }
 
-        if (result.data != null) {
+        console.log("Industry DDL Response:", result);
+
+        if (result && result.data != null) {
 
             window.industryDDLData = result.data;
 
+            // Agar dropdown pehle se render ho chuka hai,
+            // to response milte hi fill kar dein.
+            if ($("#ddlReportIndustry").length) {
+                FillIndustryDropdown("#ddlReportIndustry");
+            }
+
+        } else {
+            window.industryDDLData = [];
+            console.warn("Industry DDL data is empty.");
         }
-
     });
-
 }
+
+
+
+//function FillIndustryDropdown(selector) {
+
+//    var ddl = $(selector);
+
+//    ddl.empty();
+
+//    ddl.append(
+//        '<option value="0">Please select</option>'
+//    );
+
+//    $.each(window.industryDDLData || [], function (i, opt) {
+
+//        ddl.append(`
+//            <option value="${opt.ddlvalue}">
+//                ${opt.ddltext}
+//            </option>
+//        `);
+
+//    });
+
+//    ddl.select2({
+//        width: "100%"
+//    });
+
+//}
+
 
 function FillIndustryDropdown(selector) {
 
     var ddl = $(selector);
 
+    if (!ddl.length) {
+        console.warn("Industry dropdown not found:", selector);
+        return;
+    }
+
+    var selectedValue = ddl.val() || "0";
+
+    // Select2 already initialized ho to destroy karein.
+    if (ddl.hasClass("select2-hidden-accessible")) {
+        ddl.select2("destroy");
+    }
+
     ddl.empty();
 
     ddl.append(
-        '<option value="0">Please select</option>'
+        new Option("Please select", "0")
     );
 
     $.each(window.industryDDLData || [], function (i, opt) {
 
-        ddl.append(`
-            <option value="${opt.ddlvalue}">
-                ${opt.ddltext}
-            </option>
-        `);
+        ddl.append(
+            new Option(
+                opt.ddltext,
+                opt.ddlvalue
+            )
+        );
 
     });
+
+    // Previous selection available ho to restore karein.
+    if (ddl.find('option[value="' + selectedValue + '"]').length) {
+        ddl.val(selectedValue);
+    }
 
     ddl.select2({
         width: "100%"
     });
 
+    console.log(
+        "Industry dropdown filled. Total options:",
+        ddl.find("option").length
+    );
 }
+
 
 function ViewSelectedReport() {
     var reportType = $("#ddlReportType").val();
