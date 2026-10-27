@@ -48,7 +48,13 @@ namespace RevenueBillingApp.Controllers
         {
             try
             {
-                string ApiServiceURL = _configuration["ApiSettings:BaseUrl"];
+                string? ApiServiceURL = _configuration["ApiSettings:BaseUrl"];
+
+                if (string.IsNullOrWhiteSpace(ApiServiceURL))
+                {
+                    throw new InvalidOperationException("ApiSettings:BaseUrl is missing in configuration.");
+                }
+
                 bool enabled = _configuration.GetValue<bool>("AutoInvoice:Enabled");
 
                 if (!enabled)
